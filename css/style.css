@@ -1,0 +1,30 @@
+/* Additional styles for VietTravelGuide */
+
+/* Custom animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem !important;
+    }
+    
+    .feature-card {
+        padding: 20px !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn, .cta-buttons {
+        display: none !important;
+    }
+}
