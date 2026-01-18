@@ -314,6 +314,96 @@
             color: #1e3c72;
             width: 20px;
         }
+
+        /* ========== PWA SECTION STYLES ========== */
+        .pwa-section {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 25px;
+            margin: 60px 0;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pwa-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7);
+        }
+
+        .pwa-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .pwa-feature {
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .pwa-feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .pwa-feature i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+
+        /* ========== FACILITIES BUTTONS ========== */
+        .facility-btn {
+            padding: 30px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: #1e3c72;
+            text-align: center;
+        }
+
+        .facility-btn:hover {
+            background: #1e3c72;
+            color: white;
+            transform: translateY(-5px) scale(1.05);
+            border-color: #1e3c72;
+            box-shadow: 0 10px 25px rgba(30, 60, 114, 0.2);
+        }
+
+        .facility-btn i {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* ========== PLANNER SECTION ========== */
+        .planner-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 25px;
+            margin: 60px 0;
+            text-align: center;
+        }
+
+        .planner-section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+        }
+
         /* ========== END SEARCH STYLES ========== */
 
         /* Responsive */
@@ -322,6 +412,8 @@
             .features { grid-template-columns: 1fr; }
             .cta-buttons { flex-direction: column; align-items: center; }
             .btn { width: 100%; max-width: 300px; justify-content: center; }
+            .pwa-features { grid-template-columns: 1fr; }
+            .planner-section h2 { font-size: 2rem; }
         }
 
         /* Animation */
@@ -330,8 +422,18 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .feature-card, .map-preview, .tech-item {
+        .feature-card, .map-preview, .tech-item, .pwa-feature {
             animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
@@ -475,6 +577,9 @@
                 <button class="btn btn-secondary" onclick="clearRoute()" style="margin-left: 10px;">
                     <i class="fas fa-times"></i> Xóa lộ trình
                 </button>
+                <button class="btn btn-primary" onclick="showCurrentLocation()" style="margin-left: 10px;">
+                    <i class="fas fa-location-dot"></i> Vị trí của tôi
+                </button>
             </div>
         </section>
 
@@ -531,35 +636,38 @@
                     <div class="tech-icon"><i class="fas fa-database"></i></div>
                     <h4>Firebase</h4>
                 </div>
+                <div class="tech-item">
+                    <div class="tech-icon"><i class="fas fa-map"></i></div>
+                    <h4>Leaflet.js</h4>
+                </div>
             </div>
         </section>
 
-        <!-- Planner Section -->
-        <section id="planner-section" style="text-align: center; margin: 80px 0;">
-            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">
-                <i class="fas fa-route"></i> Tạo lộ trình thông minh
-            </h2>
-            <p style="font-size: 1.2rem; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">
-                AI sẽ giúp bạn lên kế hoạch du lịch hoàn hảo dựa trên sở thích và ngân sách
+        <!-- ========== PLANNER SECTION (ĐÃ THÊM) ========== -->
+        <section id="planner-section" class="planner-section">
+            <h2><i class="fas fa-robot"></i> Lộ trình AI</h2>
+            <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto 30px;">
+                Trí tuệ nhân tạo sẽ giúp bạn tạo lộ trình hoàn hảo dựa trên sở thích cá nhân
             </p>
-            <button class="btn btn-primary" onclick="showItineraryPlanner()">
-                <i class="fas fa-magic"></i> Bắt đầu tạo lộ trình
-            </button>
             
-            <div id="planner-container" style="margin-top: 30px;"></div>
+            <div id="planner-container"></div>
             <div id="planner-results" style="margin-top: 30px;"></div>
+            
+            <button class="btn btn-primary" onclick="showItineraryPlanner()" style="margin-top: 20px;">
+                <i class="fas fa-magic"></i> Tạo lộ trình thông minh
+            </button>
         </section>
 
-        <!-- Facilities Section -->
+        <!-- ========== FACILITIES SECTION (ĐÃ THÊM) ========== -->
         <section id="facilities-section" style="text-align: center; margin: 80px 0;">
             <h2 style="font-size: 2.5rem; margin-bottom: 20px;">
                 <i class="fas fa-concierge-bell"></i> Tiện ích & Dịch vụ
             </h2>
-            <p style="font-size: 1.2rem; margin-bottom: 30px;">
-                Tìm kiếm các tiện ích xung quanh điểm du lịch
+            <p style="font-size: 1.2rem; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Tìm kiếm các tiện ích xung quanh điểm du lịch để có chuyến đi hoàn hảo
             </p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; max-width: 1000px; margin: 0 auto;">
                 <button onclick="showFacilities('hotels')" class="facility-btn">
                     <i class="fas fa-hotel"></i><br>Khách sạn
                 </button>
@@ -572,9 +680,55 @@
                 <button onclick="showFacilities('services')" class="facility-btn">
                     <i class="fas fa-concierge-bell"></i><br>Dịch vụ
                 </button>
+                <button onclick="showFacilities('transport')" class="facility-btn">
+                    <i class="fas fa-bus"></i><br>Di chuyển
+                </button>
+                <button onclick="showFacilities('shopping')" class="facility-btn">
+                    <i class="fas fa-shopping-cart"></i><br>Mua sắm
+                </button>
             </div>
             
-            <div id="facility-results" style="margin-top: 30px;"></div>
+            <div id="facility-results" style="margin-top: 50px;"></div>
+        </section>
+
+        <!-- ========== PWA SECTION (ĐÃ THÊM) ========== -->
+        <section class="pwa-section">
+            <h2><i class="fas fa-mobile-alt"></i> Ứng dụng di động</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Cài đặt VietTravelGuide như một ứng dụng trên điện thoại của bạn
+            </p>
+            
+            <div class="pwa-features">
+                <div class="pwa-feature">
+                    <i class="fas fa-download"></i>
+                    <h3>Cài đặt nhanh</h3>
+                    <p>Không cần cửa hàng ứng dụng, cài đặt trực tiếp từ trình duyệt</p>
+                </div>
+                <div class="pwa-feature">
+                    <i class="fas fa-wifi-slash"></i>
+                    <h3>Hoạt động ngoại tuyến</h3>
+                    <p>Truy cập thông tin ngay cả khi không có kết nối Internet</p>
+                </div>
+                <div class="pwa-feature">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Nhanh như chớp</h3>
+                    <p>Tải cực nhanh và mượt mà trên mọi thiết bị</p>
+                </div>
+                <div class="pwa-feature">
+                    <i class="fas fa-bell"></i>
+                    <h3>Thông báo</h3>
+                    <p>Nhận thông báo về khuyến mãi và cập nhật mới</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <button onclick="installPWA()" class="btn btn-primary pulse" style="padding: 18px 45px; font-size: 1.2rem;">
+                    <i class="fas fa-plus-circle"></i> Thêm vào màn hình chính
+                </button>
+                <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Trên điện thoại: Chọn "Thêm vào màn hình chính" trong trình đuyệt
+                </p>
+            </div>
         </section>
 
         <!-- Call to Action -->
@@ -583,9 +737,14 @@
             <p style="font-size: 1.2rem; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">
                 VietTravelGuide sẽ đồng hành cùng bạn trong mọi chuyến đi. Từ kế hoạch chi tiết đến những trải nghiệm thực tế.
             </p>
-            <button class="btn btn-primary" onclick="startExploring()" style="padding: 20px 50px; font-size: 1.2rem;">
-                <i class="fas fa-rocket"></i> Bắt đầu hành trình ngay!
-            </button>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="startExploring()" style="padding: 20px 50px; font-size: 1.2rem;">
+                    <i class="fas fa-rocket"></i> Bắt đầu ngay
+                </button>
+                <button class="btn btn-secondary" onclick="showDemoTour()" style="padding: 20px 50px; font-size: 1.2rem;">
+                    <i class="fas fa-play"></i> Xem demo
+                </button>
+            </div>
         </section>
     </div>
 
@@ -596,26 +755,40 @@
                 <div class="footer-section">
                     <h3><i class="fas fa-info-circle"></i> Về chúng tôi</h3>
                     <p>VietTravelGuide là hệ thống hướng dẫn du lịch thông minh, kết hợp công nghệ AI với văn hóa Việt Nam.</p>
+                    <div style="margin-top: 15px;">
+                        <span style="background: #4CAF50; color: white; padding: 3px 10px; border-radius: 15px; font-size: 12px;">
+                            <i class="fas fa-code"></i> Open Source
+                        </span>
+                    </div>
                 </div>
                 
                 <div class="footer-section">
                     <h3><i class="fas fa-link"></i> Liên kết</h3>
-                    <p><a href="https://github.com/lenguyenngocthieu55/VietTravelGuide" style="color: white; text-decoration: none;">
+                    <p><a href="https://github.com/lenguyenngocthieu55/VietTravelGuide" style="color: white; text-decoration: none; display: block; margin: 5px 0;">
                         <i class="fab fa-github"></i> GitHub Repository
                     </a></p>
-                    <p><a href="https://lenguyenngocthieu55.github.io/VietTravelGuide/" style="color: white; text-decoration: none;">
+                    <p><a href="https://lenguyenngocthieu55.github.io/VietTravelGuide/" style="color: white; text-decoration: none; display: block; margin: 5px 0;">
                         <i class="fas fa-globe"></i> Website chính thức
+                    </a></p>
+                    <p><a href="#" onclick="showReportIssue()" style="color: white; text-decoration: none; display: block; margin: 5px 0;">
+                        <i class="fas fa-bug"></i> Báo lỗi
                     </a></p>
                 </div>
                 
                 <div class="footer-section">
-                    <h3><i class="fas fa-user"></i> Tác giả</h3>
+                    <h3><i class="fas fa-user"></i> Tác giả & Liên hệ</h3>
                     <p><strong>lenguyenngocthieu55</strong></p>
                     <p>Dự án được phát triển với sự hỗ trợ của AI</p>
                     
                     <div class="social-links">
-                        <a href="https://github.com/lenguyenngocthieu55" title="GitHub">
+                        <a href="https://github.com/lenguyenngocthieu55" title="GitHub" target="_blank">
                             <i class="fab fa-github"></i>
+                        </a>
+                        <a href="mailto:lenguyenngocthieu55@gmail.com" title="Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="#" onclick="showContactForm()" title="Liên hệ">
+                            <i class="fas fa-comment"></i>
                         </a>
                     </div>
                 </div>
@@ -623,7 +796,10 @@
             
             <div class="copyright">
                 <p>© 2024 VietTravelGuide. Dự án mã nguồn mở - MIT License.</p>
-                <p>Địa chỉ: Hà Nội, Việt Nam | Email: lenguyenngocthieu55@gmail.com</p>
+                <p>Phiên bản: 1.0.0 | Cập nhật: $(new Date().toLocaleDateString('vi-VN'))</p>
+                <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7;">
+                    <i class="fas fa-heart" style="color: #ff6b6b;"></i> Made with passion for Vietnamese tourism
+                </p>
             </div>
         </div>
     </footer>
@@ -645,18 +821,22 @@
             { name: "Đà Lạt", coords: [11.9465, 108.4419], type: "mountain", description: "Thành phố ngàn hoa" },
             { name: "Nha Trang", coords: [12.2388, 109.1967], type: "beach", description: "Thành phố biển" },
             { name: "Sapa", coords: [22.3364, 103.8441], type: "mountain", description: "Thị trấn sương mù" },
-            { name: "Cố đô Hoa Lư", coords: [20.2569, 105.9258], type: "historical", description: "Kinh đô đầu tiên" }
+            { name: "Cố đô Hoa Lư", coords: [20.2569, 105.9258], type: "historical", description: "Kinh đô đầu tiên" },
+            { name: "Mũi Né", coords: [10.9418, 108.2934], type: "beach", description: "Thiên đường resort" },
+            { name: "Tam Cốc - Bích Động", coords: [20.2444, 105.9239], type: "cultural", description: "Vịnh Hạ Long trên cạn" }
         ];
 
         let map;
         let markers = [];
         let routeLine = null;
+        let userLocationMarker = null;
 
         // Initialize map when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
             loadTouristSpots();
             updateResultCount();
+            checkPWAInstallable();
         });
 
         function initMap() {
@@ -683,29 +863,43 @@
                 const marker = L.marker(spot.coords)
                     .addTo(map)
                     .bindPopup(`
-                        <div style="text-align: center; min-width: 200px;">
+                        <div style="text-align: center; min-width: 220px;">
                             <h3 style="margin: 0; color: #1e3c72;">${spot.name}</h3>
-                            <p style="margin: 5px 0; color: #666;">${spot.description}</p>
+                            <p style="margin: 5px 0; color: #666; font-size: 14px;">${spot.description}</p>
                             <div style="margin: 10px 0;">
                                 <span style="background: ${getColorByType(spot.type)}; 
                                             color: white; 
-                                            padding: 3px 10px; 
+                                            padding: 3px 12px; 
                                             border-radius: 15px;
-                                            font-size: 12px;">
-                                    ${getTypeName(spot.type)}
+                                            font-size: 12px;
+                                            display: inline-block;">
+                                    <i class="fas fa-${getTypeIcon(spot.type)}"></i> ${getTypeName(spot.type)}
                                 </span>
                             </div>
-                            <button onclick="addToItinerary('${spot.name}', [${spot.coords}])" 
-                                    style="background: #4CAF50; 
-                                           color: white; 
-                                           border: none; 
-                                           padding: 8px 15px; 
-                                           border-radius: 5px; 
-                                           cursor: pointer;
-                                           margin-top: 5px;
-                                           width: 100%;">
-                                <i class="fas fa-plus"></i> Thêm vào lộ trình
-                            </button>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button onclick="addToItinerary('${spot.name}', [${spot.coords}])" 
+                                        style="flex: 1; 
+                                               background: #4CAF50; 
+                                               color: white; 
+                                               border: none; 
+                                               padding: 8px 12px; 
+                                               border-radius: 5px; 
+                                               cursor: pointer;
+                                               font-size: 13px;">
+                                    <i class="fas fa-plus"></i> Thêm
+                                </button>
+                                <button onclick="flyToLocation([${spot.coords}])" 
+                                        style="flex: 1; 
+                                               background: #2196F3; 
+                                               color: white; 
+                                               border: none; 
+                                               padding: 8px 12px; 
+                                               border-radius: 5px; 
+                                               cursor: pointer;
+                                               font-size: 13px;">
+                                    <i class="fas fa-location-arrow"></i> Xem
+                                </button>
+                            </div>
                         </div>
                     `);
                 
@@ -731,6 +925,18 @@
             return colors[type] || '#95a5a6';
         }
 
+        function getTypeIcon(type) {
+            const icons = {
+                city: 'city',
+                unesco: 'award',
+                cultural: 'landmark',
+                beach: 'umbrella-beach',
+                mountain: 'mountain',
+                historical: 'history'
+            };
+            return icons[type] || 'map-marker';
+        }
+
         function getTypeName(type) {
             const names = {
                 city: 'Thành phố',
@@ -741,6 +947,10 @@
                 historical: 'Lịch sử'
             };
             return names[type] || 'Điểm tham quan';
+        }
+
+        function flyToLocation(coords) {
+            map.flyTo(coords, 13);
         }
 
         // ========== SEARCH & FILTER FUNCTIONALITY ==========
@@ -790,9 +1000,9 @@
                 // Show success message
                 const message = `Tìm thấy ${results.length} kết quả cho "${query}":\n` + 
                               results.map(r => `• ${r.name} (${r.description})`).join('\n');
-                alert(message);
+                showNotification(message, 'success');
             } else {
-                alert(`Không tìm thấy kết quả cho "${query}".\n\nThử tìm với từ khóa khác như: Hà Nội, Hạ Long, Huế, Biển, Núi...`);
+                showNotification(`Không tìm thấy kết quả cho "${query}". Thử tìm với từ khóa khác.`, 'error');
             }
         }
 
@@ -845,7 +1055,7 @@
             if (type !== 'all') {
                 const filteredSpots = touristSpots.filter(spot => spot.type === type);
                 if (filteredSpots.length > 0) {
-                    alert(`📍 Đang hiển thị ${filteredSpots.length} điểm ${typeNames[type]}`);
+                    showNotification(`Đang hiển thị ${filteredSpots.length} điểm ${typeNames[type].toLowerCase()}`, 'info');
                 }
             }
         }
@@ -860,7 +1070,7 @@
         
         function addToItinerary(name, coords) {
             if (userItinerary.some(item => item.name === name)) {
-                alert(`"${name}" đã có trong lộ trình của bạn!`);
+                showNotification(`"${name}" đã có trong lộ trình của bạn!`, 'warning');
                 return;
             }
             
@@ -874,7 +1084,7 @@
             userItinerary.push(newItem);
             localStorage.setItem('viettravel_itinerary', JSON.stringify(userItinerary));
             
-            alert(`✅ Đã thêm "${name}" vào lộ trình!\n\nHiện có ${userItinerary.length} điểm trong lộ trình.`);
+            showNotification(`✅ Đã thêm "${name}" vào lộ trình!\n\nHiện có ${userItinerary.length} điểm trong lộ trình.`, 'success');
             
             // Update UI
             updateItineraryUI();
@@ -882,7 +1092,7 @@
         
         function calculateRoute() {
             if (userItinerary.length < 2) {
-                alert('Cần ít nhất 2 điểm trong lộ trình để tính đường đi.\n\nThêm điểm bằng cách click vào marker trên bản đồ và chọn "Thêm vào lộ trình".');
+                showNotification('Cần ít nhất 2 điểm trong lộ trình để tính đường đi.\n\nThêm điểm bằng cách click vào marker trên bản đồ.', 'warning');
                 return;
             }
             
@@ -911,24 +1121,88 @@
                 totalDistance += calculateDistance(latlngs[i], latlngs[i + 1]);
             }
             
-            alert(`🗺️ Đã tính lộ trình cho ${userItinerary.length} điểm!\n\n📏 Tổng khoảng cách: ${totalDistance.toFixed(1)} km\n⏱️ Thời gian ước tính: ${(totalDistance / 50 * 60).toFixed(0)} phút (tốc độ 50km/h)\n\nLộ trình đã được vẽ trên bản đồ.`);
+            const estimatedTime = Math.round(totalDistance / 50 * 60); // 50km/h average
+            
+            showNotification(
+                `🗺️ Đã tính lộ trình cho ${userItinerary.length} điểm!\n\n` +
+                `📏 Tổng khoảng cách: ${totalDistance.toFixed(1)} km\n` +
+                `⏱️ Thời gian ước tính: ${estimatedTime} phút (tốc độ 50km/h)\n\n` +
+                `Lộ trình đã được vẽ trên bản đồ.`,
+                'success'
+            );
         }
         
         function clearRoute() {
             if (routeLine) {
                 map.removeLayer(routeLine);
                 routeLine = null;
-                alert('Đã xóa lộ trình khỏi bản đồ.');
+                showNotification('Đã xóa lộ trình khỏi bản đồ.', 'info');
             } else {
-                alert('Không có lộ trình nào để xóa.');
+                showNotification('Không có lộ trình nào để xóa.', 'warning');
             }
+        }
+        
+        function showCurrentLocation() {
+            if (!navigator.geolocation) {
+                showNotification('Trình duyệt của bạn không hỗ trợ định vị.', 'error');
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userCoords = [position.coords.latitude, position.coords.longitude];
+                    
+                    // Remove previous user marker
+                    if (userLocationMarker) {
+                        map.removeLayer(userLocationMarker);
+                    }
+                    
+                    // Add new user marker
+                    userLocationMarker = L.marker(userCoords, {
+                        icon: L.divIcon({
+                            className: 'user-location-marker',
+                            html: '<div style="background: #2196F3; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);"></div>',
+                            iconSize: [26, 26]
+                        })
+                    })
+                    .addTo(map)
+                    .bindPopup('<b>Vị trí của bạn</b><br>Bạn đang ở đây!')
+                    .openPopup();
+                    
+                    // Fly to user location
+                    map.flyTo(userCoords, 13);
+                    
+                    // Show nearby spots
+                    const nearbySpots = touristSpots
+                        .map(spot => ({
+                            ...spot,
+                            distance: calculateDistance(userCoords, spot.coords)
+                        }))
+                        .filter(spot => spot.distance < 100) // within 100km
+                        .sort((a, b) => a.distance - b.distance)
+                        .slice(0, 5);
+                    
+                    if (nearbySpots.length > 0) {
+                        setTimeout(() => {
+                            showNotification(
+                                `📍 Bạn đang gần ${nearbySpots.length} điểm du lịch:\n\n` +
+                                nearbySpots.map(s => `• ${s.name} (${s.distance.toFixed(1)} km)`).join('\n'),
+                                'info'
+                            );
+                        }, 1000);
+                    }
+                },
+                function(error) {
+                    showNotification('Không thể lấy vị trí của bạn. Vui lòng kiểm tra cài đặt vị trí.', 'error');
+                }
+            );
         }
         
         function calculateDistance(coord1, coord2) {
             const [lat1, lon1] = coord1;
             const [lat2, lon2] = coord2;
             
-            // Haversine formula (simplified)
+            // Haversine formula
             const R = 6371; // Earth radius in km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -942,81 +1216,111 @@
         }
         
         function updateItineraryUI() {
-            // This would update a visible itinerary list
-            // For now, just show count
-            console.log(`Itinerary updated: ${userItinerary.length} items`);
+            // Update itinerary count in UI if exists
+            const itineraryCount = document.getElementById('itinerary-count');
+            if (itineraryCount) {
+                itineraryCount.textContent = userItinerary.length;
+            }
         }
         
         // ========== ITINERARY PLANNER ==========
         
         function showItineraryPlanner() {
             const html = `
-                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <h3 style="color: #1e3c72; text-align: center;">
-                        <i class="fas fa-route"></i> Tạo lộ trình thông minh
+                <div style="background: rgba(255,255,255,0.9); padding: 30px; border-radius: 20px; max-width: 500px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <h3 style="color: #1e3c72; text-align: center; margin-bottom: 30px;">
+                        <i class="fas fa-robot"></i> Tạo lộ trình AI
                     </h3>
                     
                     <div style="margin: 20px 0;">
-                        <label><i class="fas fa-calendar-day"></i> Số ngày du lịch:</label>
-                        <input type="number" id="planner-days" min="1" max="30" value="5" 
-                               style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
-                    </div>
-                    
-                    <div style="margin: 20px 0;">
-                        <label><i class="fas fa-money-bill-wave"></i> Ngân sách (triệu VND):</label>
-                        <input type="range" id="planner-budget" min="1" max="50" value="10" 
-                               style="width: 100%; margin: 10px 0;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>1 triệu</span>
-                            <span id="budget-value">10 triệu</span>
-                            <span>50 triệu</span>
+                        <label style="display: block; margin-bottom: 8px; color: #333;">
+                            <i class="fas fa-calendar-day"></i> Số ngày du lịch:
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="range" id="planner-days" min="1" max="14" value="3" 
+                                   style="flex: 1;">
+                            <span id="days-value" style="background: #1e3c72; color: white; padding: 5px 15px; border-radius: 20px; min-width: 60px; text-align: center;">
+                                3 ngày
+                            </span>
                         </div>
                     </div>
                     
                     <div style="margin: 20px 0;">
-                        <label><i class="fas fa-heart"></i> Sở thích:</label>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 10px 0;">
-                            <label style="display: flex; align-items: center;">
-                                <input type="checkbox" value="beach" style="margin-right: 8px;"> Biển
+                        <label style="display: block; margin-bottom: 8px; color: #333;">
+                            <i class="fas fa-money-bill-wave"></i> Ngân sách:
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="range" id="planner-budget" min="1" max="20" value="5" 
+                                   style="flex: 1;">
+                            <span id="budget-value" style="background: #4CAF50; color: white; padding: 5px 15px; border-radius: 20px; min-width: 100px; text-align: center;">
+                                5 triệu VND
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <label style="display: block; margin-bottom: 10px; color: #333;">
+                            <i class="fas fa-heart"></i> Sở thích của bạn:
+                        </label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            <label style="display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; cursor: pointer;">
+                                <input type="checkbox" value="beach" style="margin-bottom: 10px;">
+                                <i class="fas fa-umbrella-beach" style="color: #f1c40f; font-size: 1.5rem; margin-bottom: 5px;"></i>
+                                <span style="font-size: 12px;">Biển</span>
                             </label>
-                            <label style="display: flex; align-items: center;">
-                                <input type="checkbox" value="mountain" style="margin-right: 8px;"> Núi
+                            <label style="display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; cursor: pointer;">
+                                <input type="checkbox" value="mountain" style="margin-bottom: 10px;">
+                                <i class="fas fa-mountain" style="color: #e67e22; font-size: 1.5rem; margin-bottom: 5px;"></i>
+                                <span style="font-size: 12px;">Núi</span>
                             </label>
-                            <label style="display: flex; align-items: center;">
-                                <input type="checkbox" value="history" style="margin-right: 8px;"> Lịch sử
+                            <label style="display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; cursor: pointer;">
+                                <input type="checkbox" value="history" style="margin-bottom: 10px;">
+                                <i class="fas fa-landmark" style="color: #9b59b6; font-size: 1.5rem; margin-bottom: 5px;"></i>
+                                <span style="font-size: 12px;">Lịch sử</span>
                             </label>
-                            <label style="display: flex; align-items: center;">
-                                <input type="checkbox" value="food" style="margin-right: 8px;"> Ẩm thực
+                            <label style="display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; cursor: pointer;">
+                                <input type="checkbox" value="food" style="margin-bottom: 10px;">
+                                <i class="fas fa-utensils" style="color: #e74c3c; font-size: 1.5rem; margin-bottom: 5px;"></i>
+                                <span style="font-size: 12px;">Ẩm thực</span>
                             </label>
-                            <label style="display: flex; align-items: center;">
-                                <input type="checkbox" value="culture" style="margin-right: 8px;"> Văn hóa
+                            <label style="display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; cursor: pointer;">
+                                <input type="checkbox" value="culture" style="margin-bottom: 10px;">
+                                <i class="fas fa-theater-masks" style="color: #3498db; font-size: 1.5rem; margin-bottom: 5px;"></i>
+                                <span style="font-size: 12px;">Văn hóa</span>
                             </label>
-                            <label style="display: flex; align-items: center;">
-                                <input type="checkbox" value="adventure" style="margin-right: 8px;"> Phiêu lưu
+                            <label style="display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; cursor: pointer;">
+                                <input type="checkbox" value="adventure" style="margin-bottom: 10px;">
+                                <i class="fas fa-hiking" style="color: #2ecc71; font-size: 1.5rem; margin-bottom: 5px;"></i>
+                                <span style="font-size: 12px;">Phiêu lưu</span>
                             </label>
                         </div>
                     </div>
                     
                     <button onclick="generateSmartItinerary()" 
-                            style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                                    color: white; 
                                    padding: 15px; 
                                    border: none; 
-                                   border-radius: 8px; 
+                                   border-radius: 10px; 
                                    width: 100%; 
                                    cursor: pointer;
                                    font-size: 16px;
-                                   font-weight: bold;">
-                        <i class="fas fa-magic"></i> Tạo lộ trình AI
+                                   font-weight: bold;
+                                   margin-top: 20px;">
+                        <i class="fas fa-magic"></i> Tạo lộ trình thông minh
                     </button>
                 </div>
             `;
             
             document.getElementById('planner-container').innerHTML = html;
             
-            // Update budget value display
+            // Update value displays
+            document.getElementById('planner-days').addEventListener('input', function() {
+                document.getElementById('days-value').textContent = this.value + ' ngày';
+            });
+            
             document.getElementById('planner-budget').addEventListener('input', function() {
-                document.getElementById('budget-value').textContent = this.value + ' triệu';
+                document.getElementById('budget-value').textContent = this.value + ' triệu VND';
             });
         }
         
@@ -1027,7 +1331,7 @@
             const interests = Array.from(checkboxes).map(cb => cb.value);
             
             if (interests.length === 0) {
-                alert('Vui lòng chọn ít nhất một sở thích!');
+                showNotification('Vui lòng chọn ít nhất một sở thích!', 'warning');
                 return;
             }
             
@@ -1049,33 +1353,33 @@
                     return interestMap[interest]?.includes(spot.type);
                 });
                 
-                recommendedSpots.push(...matchingSpots.slice(0, 2)); // Limit to 2 per interest
+                recommendedSpots.push(...matchingSpots.slice(0, 2));
             });
             
             // Remove duplicates
             const uniqueSpots = Array.from(new Set(recommendedSpots.map(s => s.name)))
                 .map(name => recommendedSpots.find(s => s.name === name));
             
-            // Limit by days (approx 2 spots per day)
-            const maxSpots = Math.min(days * 2, uniqueSpots.length);
+            // Limit by days (approx 2-3 spots per day)
+            const maxSpots = Math.min(days * 2.5, uniqueSpots.length);
             const finalItinerary = uniqueSpots.slice(0, maxSpots);
             
             // Display results
             let resultHTML = `
-                <div style="background: white; padding: 25px; border-radius: 15px; margin-top: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <h4 style="color: #1e3c72; margin-bottom: 15px;">
+                <div style="background: rgba(255,255,255,0.95); padding: 25px; border-radius: 15px; margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    <h4 style="color: #1e3c72; margin-bottom: 15px; text-align: center;">
                         <i class="fas fa-map-marked-alt"></i> Lộ trình ${days} ngày đề xuất
                     </h4>
-                    <p style="color: #666; margin-bottom: 20px;">
+                    <p style="color: #666; margin-bottom: 20px; text-align: center;">
                         ${finalItinerary.length} điểm phù hợp với sở thích của bạn
                     </p>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px;">
             `;
             
             finalItinerary.forEach((spot, index) => {
                 resultHTML += `
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid ${getColorByType(spot.type)};">
+                    <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid ${getColorByType(spot.type)}; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
                             <div style="background: ${getColorByType(spot.type)}; 
                                         color: white; 
@@ -1085,14 +1389,14 @@
                                         display: flex; 
                                         align-items: center; 
                                         justify-content: center;
-                                        margin-right: 10px;">
+                                        margin-right: 10px;
+                                        font-weight: bold;">
                                 ${index + 1}
                             </div>
-                            <strong>${spot.name}</strong>
+                            <strong style="color: #1e3c72;">${spot.name}</strong>
                         </div>
-                        <div style="font-size: 14px; color: #666;">
-                            ${spot.description}<br>
-                            <small>Loại: ${getTypeName(spot.type)}</small>
+                        <div style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                            ${spot.description}
                         </div>
                         <button onclick="addToItinerary('${spot.name}', [${spot.coords}])" 
                                 style="background: ${getColorByType(spot.type)}; 
@@ -1101,9 +1405,9 @@
                                        padding: 8px 15px; 
                                        border-radius: 5px; 
                                        cursor: pointer;
-                                       margin-top: 10px;
                                        width: 100%;
-                                       font-size: 14px;">
+                                       font-size: 13px;
+                                       transition: opacity 0.3s;">
                             <i class="fas fa-plus"></i> Thêm vào lộ trình
                         </button>
                     </div>
@@ -1113,51 +1417,110 @@
             resultHTML += `
                     </div>
                     
-                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
-                        <button onclick="saveItineraryToLocal()" 
-                                style="background: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                            <i class="fas fa-save"></i> Lưu lộ trình
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="addAllToItinerary()" 
+                                style="background: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            <i class="fas fa-plus-square"></i> Thêm tất cả
                         </button>
                         <button onclick="calculateRoute()" 
-                                style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
                             <i class="fas fa-route"></i> Xem trên bản đồ
+                        </button>
+                        <button onclick="saveItineraryToLocal()" 
+                                style="background: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            <i class="fas fa-save"></i> Lưu lộ trình
                         </button>
                     </div>
                 </div>
             `;
             
             document.getElementById('planner-results').innerHTML = resultHTML;
+            
+            // Add hover effects
+            setTimeout(() => {
+                document.querySelectorAll('#planner-results button').forEach(btn => {
+                    btn.addEventListener('mouseenter', function() {
+                        this.style.opacity = '0.9';
+                    });
+                    btn.addEventListener('mouseleave', function() {
+                        this.style.opacity = '1';
+                    });
+                });
+            }, 100);
+        }
+        
+        function addAllToItinerary() {
+            const spots = touristSpots.slice(0, 5); // Add first 5 spots as demo
+            spots.forEach(spot => {
+                if (!userItinerary.some(item => item.name === spot.name)) {
+                    userItinerary.push({
+                        name: spot.name,
+                        coords: spot.coords,
+                        added: new Date().toLocaleString(),
+                        id: Date.now()
+                    });
+                }
+            });
+            localStorage.setItem('viettravel_itinerary', JSON.stringify(userItinerary));
+            showNotification(`Đã thêm ${spots.length} điểm vào lộ trình!`, 'success');
+            updateItineraryUI();
         }
         
         function saveItineraryToLocal() {
-            alert('Lộ trình đã được lưu vào bộ nhớ trình duyệt!\n\nBạn có thể xem lại bằng cách tính lộ trình trên bản đồ.');
+            const itineraryData = {
+                itinerary: userItinerary,
+                generated: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(itineraryData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `viettravelguide-itinerary-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Lộ trình đã được lưu thành file JSON!', 'success');
         }
         
         // ========== FACILITIES FUNCTIONALITY ==========
         
         const facilitiesData = {
             hotels: [
-                { name: "Khách sạn 5 sao", type: "luxury", price: "2,000,000+ VND", rating: "4.5/5" },
-                { name: "Khách sạn 3-4 sao", type: "mid-range", price: "800,000-1,500,000 VND", rating: "4.0/5" },
-                { name: "Nhà nghỉ", type: "budget", price: "200,000-500,000 VND", rating: "3.5/5" },
-                { name: "Homestay", type: "local", price: "300,000-800,000 VND", rating: "4.2/5" }
+                { name: "Khách sạn 5 sao", type: "luxury", price: "2,000,000+ VND", rating: "4.5/5", features: ["Hồ bơi", "Spa", "Nhà hàng"] },
+                { name: "Khách sạn 3-4 sao", type: "mid-range", price: "800,000-1,500,000 VND", rating: "4.0/5", features: ["WiFi", "Bữa sáng", "Đỗ xe"] },
+                { name: "Nhà nghỉ", type: "budget", price: "200,000-500,000 VND", rating: "3.5/5", features: ["Cơ bản", "Giá rẻ"] },
+                { name: "Homestay", type: "local", price: "300,000-800,000 VND", rating: "4.2/5", features: ["Trải nghiệm", "Gia đình"] }
             ],
             restaurants: [
-                { name: "Nhà hàng cao cấp", type: "fine-dining", cuisine: "Đa dạng", rating: "4.3/5" },
-                { name: "Nhà hàng địa phương", type: "local", cuisine: "Đặc sản", rating: "4.5/5" },
-                { name: "Quán ăn đường phố", type: "street-food", cuisine: "Bình dân", rating: "4.7/5" },
-                { name: "Quán cà phê", type: "cafe", cuisine: "Đồ uống", rating: "4.4/5" }
+                { name: "Nhà hàng cao cấp", type: "fine-dining", cuisine: "Quốc tế", rating: "4.3/5", price: "500,000+ VND" },
+                { name: "Nhà hàng địa phương", type: "local", cuisine: "Đặc sản", rating: "4.5/5", price: "150,000-300,000 VND" },
+                { name: "Quán ăn đường phố", type: "street-food", cuisine: "Bình dân", rating: "4.7/5", price: "30,000-100,000 VND" },
+                { name: "Quán cà phê", type: "cafe", cuisine: "Đồ uống", rating: "4.4/5", price: "40,000-80,000 VND" }
             ],
             medical: [
-                { name: "Bệnh viện đa khoa", type: "hospital", emergency: "Có", phone: "115" },
-                { name: "Phòng khám", type: "clinic", emergency: "Không", phone: "Local" },
-                { name: "Nhà thuốc", type: "pharmacy", emergency: "Không", phone: "Local" }
+                { name: "Bệnh viện đa khoa", type: "hospital", emergency: "Có", phone: "115", services: ["Cấp cứu", "Khám bệnh"] },
+                { name: "Phòng khám", type: "clinic", emergency: "Không", phone: "Địa phương", services: ["Khám thường"] },
+                { name: "Nhà thuốc", type: "pharmacy", emergency: "Không", phone: "Địa phương", services: ["Thuốc", "Dụng cụ y tế"] }
             ],
             services: [
-                { name: "ATM", type: "banking", availability: "24/7" },
-                { name: "Trạm xăng", type: "fuel", availability: "6:00-22:00" },
-                { name: "WiFi công cộng", type: "internet", availability: "Free" },
-                { name: "Bến xe/bus", type: "transport", availability: "5:00-23:00" }
+                { name: "ATM", type: "banking", availability: "24/7", banks: ["Vietcombank", "Techcombank", "BIDV"] },
+                { name: "Trạm xăng", type: "fuel", availability: "6:00-22:00", brands: ["Petrolimex", "Shell"] },
+                { name: "WiFi công cộng", type: "internet", availability: "Miễn phí", locations: ["Công viên", "Thư viện"] },
+                { name: "Bến xe/bus", type: "transport", availability: "5:00-23:00", routes: ["Nội thành", "Liên tỉnh"] }
+            ],
+            transport: [
+                { name: "Taxi", type: "taxi", companies: ["Mai Linh", "Vinasun", "Grab"], phone: "Đặt xe app" },
+                { name: "Xe máy thuê", type: "motorbike", price: "100,000-200,000 VND/ngày", requirement: "Bằng lái" },
+                { name: "Xe đạp", type: "bicycle", price: "50,000 VND/ngày", features: ["Thể thao", "Tham quan"] }
+            ],
+            shopping: [
+                { name: "Chợ địa phương", type: "market", items: ["Đặc sản", "Quà lưu niệm"], hours: "Sáng sớm" },
+                { name: "Trung tâm thương mại", type: "mall", brands: ["Thời trang", "Ẩm thực"], hours: "9:00-22:00" },
+                { name: "Cửa hàng lưu niệm", type: "souvenir", items: ["Đồ thủ công", "Bưu thiếp"], price: "30,000-500,000 VND" }
             ]
         };
         
@@ -1167,30 +1530,58 @@
                 'hotels': 'Khách sạn & Nhà nghỉ',
                 'restaurants': 'Nhà hàng & Ăn uống',
                 'medical': 'Y tế & Sức khỏe',
-                'services': 'Dịch vụ tiện ích'
+                'services': 'Dịch vụ tiện ích',
+                'transport': 'Di chuyển',
+                'shopping': 'Mua sắm'
             };
             
             let html = `
-                <div style="background: white; padding: 30px; border-radius: 15px; margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <h4 style="color: #1e3c72; margin-bottom: 20px; text-align: center;">
-                        <i class="fas fa-${getFacilityIcon(type)}"></i> ${typeNames[type]}
+                <div style="background: white; padding: 40px; border-radius: 20px; margin-top: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
+                    <h4 style="color: #1e3c72; margin-bottom: 30px; text-align: center; font-size: 1.8rem;">
+                        <i class="fas fa-${getFacilityIcon(type)}" style="margin-right: 10px;"></i> ${typeNames[type]}
                     </h4>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
             `;
             
-            facilities.forEach(facility => {
+            facilities.forEach((facility, index) => {
                 html += `
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #4CAF50;">
-                        <h5 style="margin: 0 0 10px 0; color: #1e3c72;">${facility.name}</h5>
-                        <div style="font-size: 14px; color: #666;">
-                            <div style="margin-bottom: 5px;"><strong>Loại:</strong> ${facility.type}</div>
-                            ${facility.price ? `<div style="margin-bottom: 5px;"><strong>Giá:</strong> ${facility.price}</div>` : ''}
-                            ${facility.rating ? `<div style="margin-bottom: 5px;"><strong>Đánh giá:</strong> ${facility.rating}</div>` : ''}
-                            ${facility.cuisine ? `<div style="margin-bottom: 5px;"><strong>Ẩm thực:</strong> ${facility.cuisine}</div>` : ''}
-                            ${facility.emergency ? `<div style="margin-bottom: 5px;"><strong>Cấp cứu:</strong> ${facility.emergency}</div>` : ''}
-                            ${facility.phone ? `<div style="margin-bottom: 5px;"><strong>Điện thoại:</strong> ${facility.phone}</div>` : ''}
-                            ${facility.availability ? `<div><strong>Giờ mở cửa:</strong> ${facility.availability}</div>` : ''}
+                    <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                                padding: 25px; 
+                                border-radius: 15px; 
+                                border-left: 5px solid #4CAF50;
+                                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+                                transition: transform 0.3s ease;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="background: #1e3c72; 
+                                        color: white; 
+                                        width: 35px; 
+                                        height: 35px; 
+                                        border-radius: 50%; 
+                                        display: flex; 
+                                        align-items: center; 
+                                        justify-content: center;
+                                        margin-right: 15px;
+                                        font-weight: bold;">
+                                ${index + 1}
+                            </div>
+                            <h5 style="margin: 0; color: #1e3c72; font-size: 1.2rem;">${facility.name}</h5>
+                        </div>
+                        
+                        <div style="font-size: 14px; color: #555;">
+                            <div style="margin-bottom: 8px;">
+                                <strong>Loại:</strong> ${facility.type}
+                            </div>
+                            ${facility.price ? `<div style="margin-bottom: 8px;"><strong>Giá:</strong> ${facility.price}</div>` : ''}
+                            ${facility.rating ? `<div style="margin-bottom: 8px;"><strong>Đánh giá:</strong> ${facility.rating}</div>` : ''}
+                            ${facility.cuisine ? `<div style="margin-bottom: 8px;"><strong>Ẩm thực:</strong> ${facility.cuisine}</div>` : ''}
+                            ${facility.emergency ? `<div style="margin-bottom: 8px;"><strong>Cấp cứu:</strong> ${facility.emergency}</div>` : ''}
+                            ${facility.phone ? `<div style="margin-bottom: 8px;"><strong>Điện thoại:</strong> ${facility.phone}</div>` : ''}
+                            ${facility.availability ? `<div style="margin-bottom: 8px;"><strong>Giờ hoạt động:</strong> ${facility.availability}</div>` : ''}
+                            ${facility.features ? `<div style="margin-bottom: 8px;"><strong>Tiện ích:</strong> ${facility.features.join(', ')}</div>` : ''}
+                            ${facility.services ? `<div style="margin-bottom: 8px;"><strong>Dịch vụ:</strong> ${facility.services.join(', ')}</div>` : ''}
+                            ${facility.banks ? `<div style="margin-bottom: 8px;"><strong>Ngân hàng:</strong> ${facility.banks.join(', ')}</div>` : ''}
+                            ${facility.brands ? `<div><strong>Thương hiệu:</strong> ${facility.brands.join(', ')}</div>` : ''}
                         </div>
                     </div>
                 `;
@@ -1199,13 +1590,30 @@
             html += `
                     </div>
                     
-                    <div style="margin-top: 25px; text-align: center; color: #666; font-size: 14px;">
-                        <i class="fas fa-info-circle"></i> Thông tin mang tính chất tham khảo. Vui lòng kiểm tra thực tế.
+                    <div style="margin-top: 35px; padding: 20px; background: #e3f2fd; border-radius: 10px; text-align: center;">
+                        <p style="margin: 0; color: #1565c0; font-size: 14px;">
+                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            Thông tin mang tính chất tham khảo. Vui lòng kiểm tra thực tế và giá cả tại thời điểm sử dụng.
+                        </p>
                     </div>
                 </div>
             `;
             
             document.getElementById('facility-results').innerHTML = html;
+            
+            // Add hover effects
+            setTimeout(() => {
+                document.querySelectorAll('#facility-results > div > div > div').forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                        this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.05)';
+                    });
+                });
+            }, 100);
         }
         
         function getFacilityIcon(type) {
@@ -1213,16 +1621,301 @@
                 'hotels': 'hotel',
                 'restaurants': 'utensils',
                 'medical': 'first-aid',
-                'services': 'concierge-bell'
+                'services': 'concierge-bell',
+                'transport': 'bus',
+                'shopping': 'shopping-cart'
             };
             return icons[type] || 'info-circle';
         }
         
+        // ========== PWA FUNCTIONALITY ==========
+        
+        let deferredPrompt;
+        
+        function checkPWAInstallable() {
+            // Check if PWA is already installed
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('PWA đã được cài đặt');
+                // Hide install button if already installed
+                const installBtn = document.querySelector('.pwa-section button');
+                if (installBtn) {
+                    installBtn.style.display = 'none';
+                    installBtn.parentElement.innerHTML = `
+                        <div style="background: #4CAF50; color: white; padding: 15px; border-radius: 10px;">
+                            <i class="fas fa-check-circle"></i> Ứng dụng đã được cài đặt
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showNotification('Ứng dụng đã được cài đặt thành công!', 'success');
+                        console.log('User accepted the install prompt');
+                    } else {
+                        showNotification('Cài đặt đã bị hủy.', 'info');
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                showNotification(
+                    'Để cài đặt ứng dụng:\n\n' +
+                    'Trên Android/Chrome: • Chọn menu (3 chấm) → "Thêm vào màn hình chính"\n' +
+                    'Trên iOS/Safari: • Chọn nút chia sẻ → "Thêm vào Màn hình chính"\n' +
+                    'Trên Desktop: • Click nút cài đặt trên thanh địa chỉ',
+                    'info'
+                );
+            }
+        }
+        
+        // Capture the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Update UI to notify the user they can install the PWA
+            console.log('PWA có thể cài đặt');
+        });
+        
         // ========== UI ENHANCEMENTS ==========
         
         function startExploring() {
-            alert('🚀 Chào mừng đến với VietTravelGuide!\n\nHãy bắt đầu bằng cách:\n1. Tìm kiếm điểm du lịch\n2. Thêm điểm vào lộ trình\n3. Tính toán đường đi\n4. Tìm tiện ích xung quanh\n\nChúc bạn có những trải nghiệm tuyệt vời!');
+            showNotification(
+                '🚀 Chào mừng đến với VietTravelGuide!\n\n' +
+                'Hãy bắt đầu bằng cách:\n' +
+                '1. 🔍 Tìm kiếm điểm du lịch\n' +
+                '2. 🗺️ Click marker trên bản đồ\n' +
+                '3. 🧠 Tạo lộ trình AI\n' +
+                '4. 🏨 Tìm tiện ích xung quanh\n\n' +
+                'Chúc bạn có những trải nghiệm tuyệt vời!',
+                'success'
+            );
         }
+        
+        function showDemoTour() {
+            // Create a demo tour
+            const demoSpots = touristSpots.slice(0, 3);
+            let tourHTML = `
+                <div style="background: white; padding: 30px; border-radius: 20px; margin: 20px auto; max-width: 600px; box-shadow: 0 15px 35px rgba(0,0,0,0.15);">
+                    <h3 style="color: #1e3c72; text-align: center; margin-bottom: 20px;">
+                        <i class="fas fa-play-circle"></i> Demo hành trình 3 ngày
+                    </h3>
+                    
+                    <div style="margin-bottom: 25px;">
+            `;
+            
+            demoSpots.forEach((spot, index) => {
+                tourHTML += `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid ${getColorByType(spot.type)};">
+                        <div style="display: flex; align-items: center;">
+                            <div style="background: ${getColorByType(spot.type)}; 
+                                        color: white; 
+                                        width: 30px; 
+                                        height: 30px; 
+                                        border-radius: 50%; 
+                                        display: flex; 
+                                        align-items: center; 
+                                        justify-content: center;
+                                        margin-right: 15px;
+                                        font-weight: bold;">
+                                ${index + 1}
+                            </div>
+                            <div>
+                                <strong style="color: #1e3c72;">${spot.name}</strong>
+                                <div style="font-size: 13px; color: #666;">${spot.description}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            tourHTML += `
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button onclick="startDemoTour()" 
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                       color: white; 
+                                       padding: 12px 30px; 
+                                       border: none; 
+                                       border-radius: 8px; 
+                                       cursor: pointer;
+                                       font-size: 16px;
+                                       margin: 0 10px;">
+                            <i class="fas fa-play"></i> Bắt đầu demo
+                        </button>
+                        <button onclick="closeDemo()" 
+                                style="background: #f8f9fa; 
+                                       color: #666; 
+                                       padding: 12px 30px; 
+                                       border: 1px solid #ddd; 
+                                       border-radius: 8px; 
+                                       cursor: pointer;
+                                       font-size: 16px;
+                                       margin: 0 10px;">
+                            <i class="fas fa-times"></i> Đóng
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            modal.innerHTML = tourHTML;
+            document.body.appendChild(modal);
+            
+            // Add close function
+            window.closeDemo = function() {
+                document.body.removeChild(modal);
+            };
+        }
+        
+        function startDemoTour() {
+            closeDemo();
+            
+            // Clear existing route
+            clearRoute();
+            
+            // Add demo spots to itinerary
+            const demoSpots = touristSpots.slice(0, 3);
+            demoSpots.forEach(spot => {
+                if (!userItinerary.some(item => item.name === spot.name)) {
+                    userItinerary.push({
+                        name: spot.name,
+                        coords: spot.coords,
+                        added: new Date().toLocaleString(),
+                        id: Date.now()
+                    });
+                }
+            });
+            localStorage.setItem('viettravel_itinerary', JSON.stringify(userItinerary));
+            
+            // Calculate and show route
+            setTimeout(() => {
+                calculateRoute();
+                showNotification('Đã tạo demo hành trình 3 điểm! Lộ trình đang được hiển thị trên bản đồ.', 'success');
+            }, 500);
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existing = document.getElementById('vtg-notification');
+            if (existing) existing.remove();
+            
+            const colors = {
+                'success': '#4CAF50',
+                'error': '#f44336',
+                'warning': '#FF9800',
+                'info': '#2196F3'
+            };
+            
+            const icon = {
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            
+            const notification = document.createElement('div');
+            notification.id = 'vtg-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                color: #333;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                z-index: 1000;
+                max-width: 400px;
+                border-left: 5px solid ${colors[type]};
+                animation: slideIn 0.3s ease-out;
+                font-family: inherit;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: flex-start;">
+                    <i class="fas ${icon[type]}" style="color: ${colors[type]}; font-size: 1.2rem; margin-right: 10px; margin-top: 2px;"></i>
+                    <div style="flex: 1; white-space: pre-line; font-size: 14px;">${message}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: #999; cursor: pointer; margin-left: 10px; font-size: 1.2rem;">
+                        ×
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+        
+        function showReportIssue() {
+            const email = 'lenguyenngocthieu55@gmail.com';
+            const subject = encodeURIComponent('[VietTravelGuide] Báo lỗi/Hỗ trợ');
+            const body = encodeURIComponent(`Xin chào,\n\nTôi gặp vấn đề với:\n\n1. Mô tả lỗi:\n2. Trang/Chức năng:\n3. Thiết bị/Trình duyệt:\n\nCảm ơn!`);
+            
+            window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+        }
+        
+        function showContactForm() {
+            showNotification(
+                '📧 Liên hệ:\n\n' +
+                'Email: lenguyenngocthieu55@gmail.com\n' +
+                'GitHub: https://github.com/lenguyenngocthieu55\n\n' +
+                'Vui lòng gửi email cho chúng tôi!',
+                'info'
+            );
+        }
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            .user-location-marker {
+                background: none !important;
+                border: none !important;
+            }
+        `;
+        document.head.appendChild(style);
         
         // Event Listeners
         document.getElementById('search-input').addEventListener('focus', function() {
@@ -1241,44 +1934,21 @@
             }
         });
         
-        // Add hover effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const facilityBtns = document.querySelectorAll('.facility-btn');
-            facilityBtns.forEach(btn => {
-                btn.style.cssText = `
-                    padding: 25px 15px;
-                    background: #f8f9fa;
-                    border: 2px solid #e0e0e0;
-                    border-radius: 15px;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                    font-size: 16px;
-                    color: #1e3c72;
-                `;
-                
-                btn.addEventListener('mouseenter', function() {
-                    this.style.background = '#1e3c72';
-                    this.style.color = 'white';
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                btn.addEventListener('mouseleave', function() {
-                    this.style.background = '#f8f9fa';
-                    this.style.color = '#1e3c72';
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        });
-
         // Initialize
         window.onload = function() {
             console.log('VietTravelGuide đã sẵn sàng!');
             console.log('Điểm du lịch:', touristSpots.length);
-            console.log('Lộ trình:', userItinerary.length, 'điểm');
+            console.log('Lộ trình hiện tại:', userItinerary.length, 'điểm');
             
-            // Load any saved itinerary
-            if (userItinerary.length > 0) {
-                console.log('Đã tải lộ trình từ bộ nhớ:', userItinerary);
+            // Check for PWA support
+            if ('serviceWorker' in navigator) {
+                console.log('PWA được hỗ trợ');
+            }
+            
+            // Update copyright year
+            const copyright = document.querySelector('.copyright p');
+            if (copyright) {
+                copyright.innerHTML = copyright.innerHTML.replace('2024', new Date().getFullYear());
             }
         };
     </script>
