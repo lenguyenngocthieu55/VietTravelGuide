@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VietTravelGuide - Du lịch thông minh Việt Nam</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Thêm Leaflet CSS & JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet CSS & JS cho bản đồ -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <style>
         /* Reset và base styles */
         * {
@@ -107,7 +108,7 @@
             color: #1e3c72;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-<div class="map-placeholder" id="map" style="height: 500px;"></div>
+
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
@@ -169,8 +170,7 @@
         }
 
         .map-placeholder {
-            height: 400px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 500px;
             border-radius: 15px;
             display: flex;
             flex-direction: column;
@@ -180,22 +180,6 @@
             margin: 20px 0;
             position: relative;
             overflow: hidden;
-        }
-
-        .map-placeholder::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><circle cx="20" cy="20" r="3" fill="white" opacity="0.3"/><circle cx="50" cy="50" r="5" fill="white" opacity="0.5"/><circle cx="80" cy="80" r="3" fill="white" opacity="0.3"/></svg>');
-            animation: moveBackground 20s linear infinite;
-        }
-
-        @keyframes moveBackground {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
         }
 
         /* Technology Stack */
@@ -274,6 +258,64 @@
             opacity: 0.8;
         }
 
+        /* ========== SEARCH & FILTER STYLES ========== */
+        .filter-btn {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-btn:hover {
+            background: #f0f7ff;
+            border-color: #1e3c72;
+            transform: translateY(-2px);
+        }
+        
+        .filter-btn.active {
+            background: #1e3c72;
+            color: white;
+            border-color: #1e3c72;
+        }
+        
+        .filter-btn i {
+            font-size: 16px;
+        }
+        
+        #search-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        #search-suggestions div {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.3s;
+        }
+        
+        #search-suggestions div:hover {
+            background: #f5f7fa;
+            border-radius: 5px;
+        }
+        
+        #search-suggestions div:last-child {
+            border-bottom: none;
+        }
+        
+        #search-suggestions div i {
+            margin-right: 10px;
+            color: #1e3c72;
+            width: 20px;
+        }
+        /* ========== END SEARCH STYLES ========== */
+
         /* Responsive */
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
@@ -311,21 +353,127 @@
         </div>
     </header>
 
+    <!-- Search & Filter Section -->
+    <div style="background: white; padding: 30px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="color: #1e3c72;">
+                    <i class="fas fa-search"></i> Tìm kiếm điểm du lịch
+                </h2>
+                <p>Tìm kiếm theo tên, địa điểm hoặc loại hình du lịch</p>
+            </div>
+            
+            <!-- Search Bar -->
+            <div style="max-width: 600px; margin: 0 auto 20px;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" 
+                           id="search-input" 
+                           placeholder="Nhập tên điểm du lịch, tỉnh thành..."
+                           style="flex: 1; 
+                                  padding: 15px 20px; 
+                                  border: 2px solid #e0e0e0; 
+                                  border-radius: 50px; 
+                                  font-size: 16px;
+                                  outline: none;
+                                  transition: border 0.3s;">
+                    <button onclick="searchLocation()" 
+                            style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                                   color: white; 
+                                   border: none; 
+                                   padding: 0 30px; 
+                                   border-radius: 50px; 
+                                   cursor: pointer;
+                                   font-weight: bold;
+                                   transition: transform 0.3s;">
+                        <i class="fas fa-search"></i> Tìm
+                    </button>
+                </div>
+                
+                <!-- Search Suggestions -->
+                <div id="search-suggestions" 
+                     style="display: none; 
+                            background: white; 
+                            border: 1px solid #e0e0e0; 
+                            border-radius: 10px; 
+                            margin-top: 10px; 
+                            padding: 10px;
+                            box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <div style="padding: 5px; cursor: pointer;" onclick="quickSearch('Hà Nội')">
+                        <i class="fas fa-city"></i> Hà Nội
+                    </div>
+                    <div style="padding: 5px; cursor: pointer;" onclick="quickSearch('Hạ Long')">
+                        <i class="fas fa-umbrella-beach"></i> Vịnh Hạ Long
+                    </div>
+                    <div style="padding: 5px; cursor: pointer;" onclick="quickSearch('Huế')">
+                        <i class="fas fa-landmark"></i> Huế
+                    </div>
+                    <div style="padding: 5px; cursor: pointer;" onclick="quickSearch('Hội An')">
+                        <i class="fas fa-history"></i> Hội An
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                <button onclick="filterByType('all')" 
+                        class="filter-btn active"
+                        style="background: #1e3c72; color: white;">
+                    <i class="fas fa-globe-asia"></i> Tất cả
+                </button>
+                <button onclick="filterByType('unesco')" 
+                        class="filter-btn">
+                    <i class="fas fa-award"></i> Di sản UNESCO
+                </button>
+                <button onclick="filterByType('beach')" 
+                        class="filter-btn">
+                    <i class="fas fa-umbrella-beach"></i> Biển đảo
+                </button>
+                <button onclick="filterByType('mountain')" 
+                        class="filter-btn">
+                    <i class="fas fa-mountain"></i> Núi rừng
+                </button>
+                <button onclick="filterByType('cultural')" 
+                        class="filter-btn">
+                    <i class="fas fa-landmark"></i> Văn hóa
+                </button>
+                <button onclick="filterByType('historical')" 
+                        class="filter-btn">
+                    <i class="fas fa-history"></i> Lịch sử
+                </button>
+                <button onclick="filterByType('city')" 
+                        class="filter-btn">
+                    <i class="fas fa-city"></i> Thành phố
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Status -->
+    <div id="filter-status" 
+         style="text-align: center; 
+                padding: 10px; 
+                background: #f8f9fa; 
+                border-radius: 10px; 
+                margin: 20px auto; 
+                max-width: 800px;">
+        Đang hiển thị: <span id="current-filter">Tất cả điểm du lịch</span>
+        <span id="result-count" style="background: #4CAF50; color: white; padding: 2px 10px; border-radius: 10px; margin-left: 10px;">10 điểm</span>
+    </div>
+
     <div class="container">
         <!-- Map Preview -->
         <section class="map-preview">
             <h2><i class="fas fa-map"></i> Bản đồ du lịch thông minh</h2>
             <p>Khám phá các điểm đến tuyệt vời của Việt Nam trên bản đồ tương tác</p>
             
-            <div class="map-placeholder" onclick="showMapDemo()">
-                <i class="fas fa-globe-asia" style="font-size: 4rem; margin-bottom: 20px;"></i>
-                <h3>Bản đồ Việt Nam</h3>
-                <p>Click để xem demo bản đồ tương tác</p>
-            </div>
+            <div class="map-placeholder" id="map"></div>
             
             <div style="margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="showMapDemo()">
-                    <i class="fas fa-search-location"></i> Tìm kiếm địa điểm
+                <button class="btn btn-secondary" onclick="calculateRoute()">
+                    <i class="fas fa-route"></i> Tính lộ trình
+                </button>
+                <button class="btn btn-secondary" onclick="clearRoute()" style="margin-left: 10px;">
+                    <i class="fas fa-times"></i> Xóa lộ trình
                 </button>
             </div>
         </section>
@@ -386,6 +534,49 @@
             </div>
         </section>
 
+        <!-- Planner Section -->
+        <section id="planner-section" style="text-align: center; margin: 80px 0;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">
+                <i class="fas fa-route"></i> Tạo lộ trình thông minh
+            </h2>
+            <p style="font-size: 1.2rem; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                AI sẽ giúp bạn lên kế hoạch du lịch hoàn hảo dựa trên sở thích và ngân sách
+            </p>
+            <button class="btn btn-primary" onclick="showItineraryPlanner()">
+                <i class="fas fa-magic"></i> Bắt đầu tạo lộ trình
+            </button>
+            
+            <div id="planner-container" style="margin-top: 30px;"></div>
+            <div id="planner-results" style="margin-top: 30px;"></div>
+        </section>
+
+        <!-- Facilities Section -->
+        <section id="facilities-section" style="text-align: center; margin: 80px 0;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">
+                <i class="fas fa-concierge-bell"></i> Tiện ích & Dịch vụ
+            </h2>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">
+                Tìm kiếm các tiện ích xung quanh điểm du lịch
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto;">
+                <button onclick="showFacilities('hotels')" class="facility-btn">
+                    <i class="fas fa-hotel"></i><br>Khách sạn
+                </button>
+                <button onclick="showFacilities('restaurants')" class="facility-btn">
+                    <i class="fas fa-utensils"></i><br>Nhà hàng
+                </button>
+                <button onclick="showFacilities('medical')" class="facility-btn">
+                    <i class="fas fa-first-aid"></i><br>Y tế
+                </button>
+                <button onclick="showFacilities('services')" class="facility-btn">
+                    <i class="fas fa-concierge-bell"></i><br>Dịch vụ
+                </button>
+            </div>
+            
+            <div id="facility-results" style="margin-top: 30px;"></div>
+        </section>
+
         <!-- Call to Action -->
         <section style="text-align: center; margin: 80px 0;">
             <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Sẵn sàng khám phá?</h2>
@@ -438,262 +629,658 @@
     </footer>
 
     <script>
-        // Demo Functions
-        function startExploring() {
-            alert('🚀 Chào mừng đến với VietTravelGuide!\n\nTính năng đang được phát triển.\nWebsite chính thức sẽ sớm ra mắt!');
+        // ========== MAP FUNCTIONALITY ==========
+        
+        // Vietnam coordinates
+        const vietnamCenter = [16.0, 108.0];
+        
+        // Tourist spots in Vietnam
+        const touristSpots = [
+            { name: "Hà Nội", coords: [21.0285, 105.8542], type: "city", description: "Thủ đô Việt Nam" },
+            { name: "Vịnh Hạ Long", coords: [20.9101, 107.1839], type: "unesco", description: "Di sản thiên nhiên thế giới" },
+            { name: "Huế", coords: [16.4637, 107.5909], type: "cultural", description: "Cố đô Việt Nam" },
+            { name: "Hội An", coords: [15.8801, 108.3380], type: "unesco", description: "Phố cổ Hội An" },
+            { name: "Sài Gòn", coords: [10.8231, 106.6297], type: "city", description: "Thành phố Hồ Chí Minh" },
+            { name: "Phú Quốc", coords: [10.2236, 103.9608], type: "beach", description: "Đảo ngọc Phú Quốc" },
+            { name: "Đà Lạt", coords: [11.9465, 108.4419], type: "mountain", description: "Thành phố ngàn hoa" },
+            { name: "Nha Trang", coords: [12.2388, 109.1967], type: "beach", description: "Thành phố biển" },
+            { name: "Sapa", coords: [22.3364, 103.8441], type: "mountain", description: "Thị trấn sương mù" },
+            { name: "Cố đô Hoa Lư", coords: [20.2569, 105.9258], type: "historical", description: "Kinh đô đầu tiên" }
+        ];
+
+        let map;
+        let markers = [];
+        let routeLine = null;
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            loadTouristSpots();
+            updateResultCount();
+        });
+
+        function initMap() {
+            // Create map
+            map = L.map('map').setView(vietnamCenter, 6);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+            
+            // Add scale
+            L.control.scale().addTo(map);
         }
 
-        function showMapDemo() {
-            const mapDiv = document.querySelector('.map-placeholder');
-            mapDiv.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: white;">
-                    <i class="fas fa-map-marked-alt" style="font-size: 4rem; margin-bottom: 20px;"></i>
-                    <h3>Bản đồ tương tác</h3>
-                    <p>Đang tải các điểm du lịch nổi tiếng...</p>
+        function loadTouristSpots() {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            // Add markers for each tourist spot
+            touristSpots.forEach(spot => {
+                const marker = L.marker(spot.coords)
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="text-align: center; min-width: 200px;">
+                            <h3 style="margin: 0; color: #1e3c72;">${spot.name}</h3>
+                            <p style="margin: 5px 0; color: #666;">${spot.description}</p>
+                            <div style="margin: 10px 0;">
+                                <span style="background: ${getColorByType(spot.type)}; 
+                                            color: white; 
+                                            padding: 3px 10px; 
+                                            border-radius: 15px;
+                                            font-size: 12px;">
+                                    ${getTypeName(spot.type)}
+                                </span>
+                            </div>
+                            <button onclick="addToItinerary('${spot.name}', [${spot.coords}])" 
+                                    style="background: #4CAF50; 
+                                           color: white; 
+                                           border: none; 
+                                           padding: 8px 15px; 
+                                           border-radius: 5px; 
+                                           cursor: pointer;
+                                           margin-top: 5px;
+                                           width: 100%;">
+                                <i class="fas fa-plus"></i> Thêm vào lộ trình
+                            </button>
+                        </div>
+                    `);
+                
+                markers.push(marker);
+            });
+            
+            // Fit bounds to show all markers
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        function getColorByType(type) {
+            const colors = {
+                city: '#e74c3c',
+                unesco: '#3498db',
+                cultural: '#9b59b6',
+                beach: '#f1c40f',
+                mountain: '#e67e22',
+                historical: '#34495e'
+            };
+            return colors[type] || '#95a5a6';
+        }
+
+        function getTypeName(type) {
+            const names = {
+                city: 'Thành phố',
+                unesco: 'Di sản UNESCO',
+                cultural: 'Văn hóa',
+                beach: 'Biển',
+                mountain: 'Núi',
+                historical: 'Lịch sử'
+            };
+            return names[type] || 'Điểm tham quan';
+        }
+
+        // ========== SEARCH & FILTER FUNCTIONALITY ==========
+        
+        function searchLocation() {
+            const searchInput = document.getElementById('search-input');
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                alert('Vui lòng nhập từ khóa tìm kiếm');
+                return;
+            }
+            
+            // Search in tourist spots
+            const results = touristSpots.filter(spot => 
+                spot.name.toLowerCase().includes(query.toLowerCase()) ||
+                spot.description.toLowerCase().includes(query.toLowerCase()) ||
+                spot.type.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (results.length > 0) {
+                // Update result count
+                document.getElementById('result-count').textContent = `${results.length} điểm`;
+                
+                // Clear previous highlights
+                markers.forEach(marker => {
+                    marker.setOpacity(1);
+                });
+                
+                // Highlight found markers
+                results.forEach(result => {
+                    const marker = markers.find(m => 
+                        m.getLatLng().lat === result.coords[0] && 
+                        m.getLatLng().lng === result.coords[1]
+                    );
+                    if (marker) {
+                        marker.setOpacity(1);
+                        marker.openPopup();
+                        
+                        // Fly to first result
+                        if (results[0] === result) {
+                            map.flyTo(result.coords, 10);
+                        }
+                    }
+                });
+                
+                // Show success message
+                const message = `Tìm thấy ${results.length} kết quả cho "${query}":\n` + 
+                              results.map(r => `• ${r.name} (${r.description})`).join('\n');
+                alert(message);
+            } else {
+                alert(`Không tìm thấy kết quả cho "${query}".\n\nThử tìm với từ khóa khác như: Hà Nội, Hạ Long, Huế, Biển, Núi...`);
+            }
+        }
+
+        function quickSearch(keyword) {
+            document.getElementById('search-input').value = keyword;
+            searchLocation();
+            document.getElementById('search-suggestions').style.display = 'none';
+        }
+
+        function filterByType(type) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update filter status
+            const typeNames = {
+                'all': 'Tất cả điểm du lịch',
+                'unesco': 'Di sản UNESCO',
+                'beach': 'Biển đảo',
+                'mountain': 'Núi rừng',
+                'cultural': 'Di sản văn hóa',
+                'historical': 'Di tích lịch sử',
+                'city': 'Thành phố'
+            };
+            
+            document.getElementById('current-filter').textContent = typeNames[type] || type;
+            
+            // Filter markers
+            let visibleCount = 0;
+            markers.forEach(marker => {
+                const spot = touristSpots.find(s => 
+                    s.coords[0] === marker.getLatLng().lat && 
+                    s.coords[1] === marker.getLatLng().lng
+                );
+                
+                if (type === 'all' || (spot && spot.type === type)) {
+                    marker.setOpacity(1);
+                    visibleCount++;
+                } else {
+                    marker.setOpacity(0.3);
+                }
+            });
+            
+            // Update result count
+            document.getElementById('result-count').textContent = `${visibleCount} điểm`;
+            
+            // Show filter message
+            if (type !== 'all') {
+                const filteredSpots = touristSpots.filter(spot => spot.type === type);
+                if (filteredSpots.length > 0) {
+                    alert(`📍 Đang hiển thị ${filteredSpots.length} điểm ${typeNames[type]}`);
+                }
+            }
+        }
+
+        function updateResultCount() {
+            document.getElementById('result-count').textContent = `${touristSpots.length} điểm`;
+        }
+
+        // ========== ITINERARY FUNCTIONALITY ==========
+        
+        let userItinerary = JSON.parse(localStorage.getItem('viettravel_itinerary') || '[]');
+        
+        function addToItinerary(name, coords) {
+            if (userItinerary.some(item => item.name === name)) {
+                alert(`"${name}" đã có trong lộ trình của bạn!`);
+                return;
+            }
+            
+            const newItem = {
+                name: name,
+                coords: coords,
+                added: new Date().toLocaleString(),
+                id: Date.now()
+            };
+            
+            userItinerary.push(newItem);
+            localStorage.setItem('viettravel_itinerary', JSON.stringify(userItinerary));
+            
+            alert(`✅ Đã thêm "${name}" vào lộ trình!\n\nHiện có ${userItinerary.length} điểm trong lộ trình.`);
+            
+            // Update UI
+            updateItineraryUI();
+        }
+        
+        function calculateRoute() {
+            if (userItinerary.length < 2) {
+                alert('Cần ít nhất 2 điểm trong lộ trình để tính đường đi.\n\nThêm điểm bằng cách click vào marker trên bản đồ và chọn "Thêm vào lộ trình".');
+                return;
+            }
+            
+            // Get coordinates from itinerary
+            const latlngs = userItinerary.map(item => item.coords);
+            
+            // Remove existing route
+            if (routeLine) {
+                map.removeLayer(routeLine);
+            }
+            
+            // Create new route line
+            routeLine = L.polyline(latlngs, {
+                color: '#4CAF50',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '10, 10'
+            }).addTo(map);
+            
+            // Fit bounds to show entire route
+            map.fitBounds(latlngs);
+            
+            // Calculate total distance (simplified)
+            let totalDistance = 0;
+            for (let i = 0; i < latlngs.length - 1; i++) {
+                totalDistance += calculateDistance(latlngs[i], latlngs[i + 1]);
+            }
+            
+            alert(`🗺️ Đã tính lộ trình cho ${userItinerary.length} điểm!\n\n📏 Tổng khoảng cách: ${totalDistance.toFixed(1)} km\n⏱️ Thời gian ước tính: ${(totalDistance / 50 * 60).toFixed(0)} phút (tốc độ 50km/h)\n\nLộ trình đã được vẽ trên bản đồ.`);
+        }
+        
+        function clearRoute() {
+            if (routeLine) {
+                map.removeLayer(routeLine);
+                routeLine = null;
+                alert('Đã xóa lộ trình khỏi bản đồ.');
+            } else {
+                alert('Không có lộ trình nào để xóa.');
+            }
+        }
+        
+        function calculateDistance(coord1, coord2) {
+            const [lat1, lon1] = coord1;
+            const [lat2, lon2] = coord2;
+            
+            // Haversine formula (simplified)
+            const R = 6371; // Earth radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        function updateItineraryUI() {
+            // This would update a visible itinerary list
+            // For now, just show count
+            console.log(`Itinerary updated: ${userItinerary.length} items`);
+        }
+        
+        // ========== ITINERARY PLANNER ==========
+        
+        function showItineraryPlanner() {
+            const html = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h3 style="color: #1e3c72; text-align: center;">
+                        <i class="fas fa-route"></i> Tạo lộ trình thông minh
+                    </h3>
+                    
                     <div style="margin: 20px 0;">
-                        <div style="display: inline-block; margin: 10px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
-                            <i class="fas fa-city"></i> Hà Nội
-                        </div>
-                        <div style="display: inline-block; margin: 10px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
-                            <i class="fas fa-umbrella-beach"></i> Hạ Long
-                        </div>
-                        <div style="display: inline-block; margin: 10px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
-                            <i class="fas fa-history"></i> Huế
+                        <label><i class="fas fa-calendar-day"></i> Số ngày du lịch:</label>
+                        <input type="number" id="planner-days" min="1" max="30" value="5" 
+                               style="width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <label><i class="fas fa-money-bill-wave"></i> Ngân sách (triệu VND):</label>
+                        <input type="range" id="planner-budget" min="1" max="50" value="10" 
+                               style="width: 100%; margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>1 triệu</span>
+                            <span id="budget-value">10 triệu</span>
+                            <span>50 triệu</span>
                         </div>
                     </div>
-                    <p><small>Bản đồ đầy đủ sẽ sớm có mặt!</small></p>
+                    
+                    <div style="margin: 20px 0;">
+                        <label><i class="fas fa-heart"></i> Sở thích:</label>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 10px 0;">
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox" value="beach" style="margin-right: 8px;"> Biển
+                            </label>
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox" value="mountain" style="margin-right: 8px;"> Núi
+                            </label>
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox" value="history" style="margin-right: 8px;"> Lịch sử
+                            </label>
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox" value="food" style="margin-right: 8px;"> Ẩm thực
+                            </label>
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox" value="culture" style="margin-right: 8px;"> Văn hóa
+                            </label>
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox" value="adventure" style="margin-right: 8px;"> Phiêu lưu
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button onclick="generateSmartItinerary()" 
+                            style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                                   color: white; 
+                                   padding: 15px; 
+                                   border: none; 
+                                   border-radius: 8px; 
+                                   width: 100%; 
+                                   cursor: pointer;
+                                   font-size: 16px;
+                                   font-weight: bold;">
+                        <i class="fas fa-magic"></i> Tạo lộ trình AI
+                    </button>
                 </div>
             `;
             
-            setTimeout(() => {
-                alert('🗺️ Tính năng bản đồ đang được hoàn thiện!\n\nSẽ bao gồm:\n• Bản đồ Việt Nam tương tác\n• 1000+ điểm du lịch\n• Tìm đường thông minh\n• Thông tin chi tiết từng điểm');
-            }, 1000);
-        }
-
-        // Add hover effects
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
+            document.getElementById('planner-container').innerHTML = html;
             
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-
-        // Animate on scroll
-        function checkVisibility() {
-            const elements = document.querySelectorAll('.feature-card, .tech-item');
-            
-            elements.forEach(element => {
-                const rect = element.getBoundingClientRect();
-                if (rect.top < window.innerHeight - 100) {
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
-                }
+            // Update budget value display
+            document.getElementById('planner-budget').addEventListener('input', function() {
+                document.getElementById('budget-value').textContent = this.value + ' triệu';
             });
         }
-
-        window.addEventListener('scroll', checkVisibility);
-        window.addEventListener('load', checkVisibility);
-
-        // Initialize animations
-        document.querySelectorAll('.feature-card, .tech-item').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        });
-    </script>
-    <script>
-    // Initialize map when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        initMap();
-        loadTouristSpots();
-    });
-
-    // Vietnam coordinates
-    const vietnamCenter = [16.0, 108.0];
-    
-    // Tourist spots in Vietnam
-    const touristSpots = [
-        { name: "Hà Nội", coords: [21.0285, 105.8542], type: "capital", description: "Thủ đô Việt Nam" },
-        { name: "Vịnh Hạ Long", coords: [20.9101, 107.1839], type: "unesco", description: "Di sản thiên nhiên thế giới" },
-        { name: "Huế", coords: [16.4637, 107.5909], type: "cultural", description: "Cố đô Việt Nam" },
-        { name: "Hội An", coords: [15.8801, 108.3380], type: "unesco", description: "Phố cổ Hội An" },
-        { name: "Sài Gòn", coords: [10.8231, 106.6297], type: "city", description: "Thành phố Hồ Chí Minh" },
-        { name: "Phú Quốc", coords: [10.2236, 103.9608], type: "beach", description: "Đảo ngọc Phú Quốc" },
-        { name: "Đà Lạt", coords: [11.9465, 108.4419], type: "mountain", description: "Thành phố ngàn hoa" },
-        { name: "Nha Trang", coords: [12.2388, 109.1967], type: "beach", description: "Thành phố biển" },
-        { name: "Sapa", coords: [22.3364, 103.8441], type: "mountain", description: "Thị trấn sương mù" },
-        { name: "Cố đô Hoa Lư", coords: [20.2569, 105.9258], type: "historical", description: "Kinh đô đầu tiên" }
-    ];
-
-    let map;
-    let markers = [];
-
-    function initMap() {
-        // Create map
-        map = L.map('map').setView(vietnamCenter, 6);
         
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 18
-        }).addTo(map);
-        
-        // Add scale
-        L.control.scale().addTo(map);
-    }
-
-    function loadTouristSpots() {
-        // Clear existing markers
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-        
-        // Add markers for each tourist spot
-        touristSpots.forEach(spot => {
-            const marker = L.marker(spot.coords)
-                .addTo(map)
-                .bindPopup(`
-                    <div style="text-align: center;">
-                        <h3 style="margin: 0; color: #1e3c72;">${spot.name}</h3>
-                        <p style="margin: 5px 0; color: #666;">${spot.description}</p>
-                        <div style="margin: 10px 0;">
-                            <span style="background: ${getColorByType(spot.type)}; 
+        function generateSmartItinerary() {
+            const days = parseInt(document.getElementById('planner-days').value);
+            const budget = parseInt(document.getElementById('planner-budget').value) * 1000000;
+            const checkboxes = document.querySelectorAll('#planner-container input[type="checkbox"]:checked');
+            const interests = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (interests.length === 0) {
+                alert('Vui lòng chọn ít nhất một sở thích!');
+                return;
+            }
+            
+            // Simple AI itinerary generation
+            const recommendedSpots = [];
+            
+            // Match interests with spot types
+            interests.forEach(interest => {
+                const matchingSpots = touristSpots.filter(spot => {
+                    const interestMap = {
+                        'beach': ['beach'],
+                        'mountain': ['mountain'],
+                        'history': ['historical', 'cultural'],
+                        'culture': ['cultural', 'unesco'],
+                        'food': ['city'],
+                        'adventure': ['mountain', 'beach']
+                    };
+                    
+                    return interestMap[interest]?.includes(spot.type);
+                });
+                
+                recommendedSpots.push(...matchingSpots.slice(0, 2)); // Limit to 2 per interest
+            });
+            
+            // Remove duplicates
+            const uniqueSpots = Array.from(new Set(recommendedSpots.map(s => s.name)))
+                .map(name => recommendedSpots.find(s => s.name === name));
+            
+            // Limit by days (approx 2 spots per day)
+            const maxSpots = Math.min(days * 2, uniqueSpots.length);
+            const finalItinerary = uniqueSpots.slice(0, maxSpots);
+            
+            // Display results
+            let resultHTML = `
+                <div style="background: white; padding: 25px; border-radius: 15px; margin-top: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">
+                        <i class="fas fa-map-marked-alt"></i> Lộ trình ${days} ngày đề xuất
+                    </h4>
+                    <p style="color: #666; margin-bottom: 20px;">
+                        ${finalItinerary.length} điểm phù hợp với sở thích của bạn
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            `;
+            
+            finalItinerary.forEach((spot, index) => {
+                resultHTML += `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid ${getColorByType(spot.type)};">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="background: ${getColorByType(spot.type)}; 
                                         color: white; 
-                                        padding: 3px 10px; 
-                                        border-radius: 15px;
-                                        font-size: 12px;">
-                                ${getTypeName(spot.type)}
-                            </span>
+                                        width: 30px; 
+                                        height: 30px; 
+                                        border-radius: 50%; 
+                                        display: flex; 
+                                        align-items: center; 
+                                        justify-content: center;
+                                        margin-right: 10px;">
+                                ${index + 1}
+                            </div>
+                            <strong>${spot.name}</strong>
                         </div>
-                        <button onclick="planTo('${spot.name}', [${spot.coords}])" 
-                                style="background: #4CAF50; 
+                        <div style="font-size: 14px; color: #666;">
+                            ${spot.description}<br>
+                            <small>Loại: ${getTypeName(spot.type)}</small>
+                        </div>
+                        <button onclick="addToItinerary('${spot.name}', [${spot.coords}])" 
+                                style="background: ${getColorByType(spot.type)}; 
                                        color: white; 
                                        border: none; 
                                        padding: 8px 15px; 
                                        border-radius: 5px; 
                                        cursor: pointer;
-                                       margin-top: 5px;">
-                            Thêm vào lộ trình
+                                       margin-top: 10px;
+                                       width: 100%;
+                                       font-size: 14px;">
+                            <i class="fas fa-plus"></i> Thêm vào lộ trình
                         </button>
                     </div>
-                `);
+                `;
+            });
             
-            markers.push(marker);
+            resultHTML += `
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="saveItineraryToLocal()" 
+                                style="background: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-save"></i> Lưu lộ trình
+                        </button>
+                        <button onclick="calculateRoute()" 
+                                style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-route"></i> Xem trên bản đồ
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('planner-results').innerHTML = resultHTML;
+        }
+        
+        function saveItineraryToLocal() {
+            alert('Lộ trình đã được lưu vào bộ nhớ trình duyệt!\n\nBạn có thể xem lại bằng cách tính lộ trình trên bản đồ.');
+        }
+        
+        // ========== FACILITIES FUNCTIONALITY ==========
+        
+        const facilitiesData = {
+            hotels: [
+                { name: "Khách sạn 5 sao", type: "luxury", price: "2,000,000+ VND", rating: "4.5/5" },
+                { name: "Khách sạn 3-4 sao", type: "mid-range", price: "800,000-1,500,000 VND", rating: "4.0/5" },
+                { name: "Nhà nghỉ", type: "budget", price: "200,000-500,000 VND", rating: "3.5/5" },
+                { name: "Homestay", type: "local", price: "300,000-800,000 VND", rating: "4.2/5" }
+            ],
+            restaurants: [
+                { name: "Nhà hàng cao cấp", type: "fine-dining", cuisine: "Đa dạng", rating: "4.3/5" },
+                { name: "Nhà hàng địa phương", type: "local", cuisine: "Đặc sản", rating: "4.5/5" },
+                { name: "Quán ăn đường phố", type: "street-food", cuisine: "Bình dân", rating: "4.7/5" },
+                { name: "Quán cà phê", type: "cafe", cuisine: "Đồ uống", rating: "4.4/5" }
+            ],
+            medical: [
+                { name: "Bệnh viện đa khoa", type: "hospital", emergency: "Có", phone: "115" },
+                { name: "Phòng khám", type: "clinic", emergency: "Không", phone: "Local" },
+                { name: "Nhà thuốc", type: "pharmacy", emergency: "Không", phone: "Local" }
+            ],
+            services: [
+                { name: "ATM", type: "banking", availability: "24/7" },
+                { name: "Trạm xăng", type: "fuel", availability: "6:00-22:00" },
+                { name: "WiFi công cộng", type: "internet", availability: "Free" },
+                { name: "Bến xe/bus", type: "transport", availability: "5:00-23:00" }
+            ]
+        };
+        
+        function showFacilities(type) {
+            const facilities = facilitiesData[type] || [];
+            const typeNames = {
+                'hotels': 'Khách sạn & Nhà nghỉ',
+                'restaurants': 'Nhà hàng & Ăn uống',
+                'medical': 'Y tế & Sức khỏe',
+                'services': 'Dịch vụ tiện ích'
+            };
+            
+            let html = `
+                <div style="background: white; padding: 30px; border-radius: 15px; margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h4 style="color: #1e3c72; margin-bottom: 20px; text-align: center;">
+                        <i class="fas fa-${getFacilityIcon(type)}"></i> ${typeNames[type]}
+                    </h4>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            `;
+            
+            facilities.forEach(facility => {
+                html += `
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #4CAF50;">
+                        <h5 style="margin: 0 0 10px 0; color: #1e3c72;">${facility.name}</h5>
+                        <div style="font-size: 14px; color: #666;">
+                            <div style="margin-bottom: 5px;"><strong>Loại:</strong> ${facility.type}</div>
+                            ${facility.price ? `<div style="margin-bottom: 5px;"><strong>Giá:</strong> ${facility.price}</div>` : ''}
+                            ${facility.rating ? `<div style="margin-bottom: 5px;"><strong>Đánh giá:</strong> ${facility.rating}</div>` : ''}
+                            ${facility.cuisine ? `<div style="margin-bottom: 5px;"><strong>Ẩm thực:</strong> ${facility.cuisine}</div>` : ''}
+                            ${facility.emergency ? `<div style="margin-bottom: 5px;"><strong>Cấp cứu:</strong> ${facility.emergency}</div>` : ''}
+                            ${facility.phone ? `<div style="margin-bottom: 5px;"><strong>Điện thoại:</strong> ${facility.phone}</div>` : ''}
+                            ${facility.availability ? `<div><strong>Giờ mở cửa:</strong> ${facility.availability}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    
+                    <div style="margin-top: 25px; text-align: center; color: #666; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> Thông tin mang tính chất tham khảo. Vui lòng kiểm tra thực tế.
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('facility-results').innerHTML = html;
+        }
+        
+        function getFacilityIcon(type) {
+            const icons = {
+                'hotels': 'hotel',
+                'restaurants': 'utensils',
+                'medical': 'first-aid',
+                'services': 'concierge-bell'
+            };
+            return icons[type] || 'info-circle';
+        }
+        
+        // ========== UI ENHANCEMENTS ==========
+        
+        function startExploring() {
+            alert('🚀 Chào mừng đến với VietTravelGuide!\n\nHãy bắt đầu bằng cách:\n1. Tìm kiếm điểm du lịch\n2. Thêm điểm vào lộ trình\n3. Tính toán đường đi\n4. Tìm tiện ích xung quanh\n\nChúc bạn có những trải nghiệm tuyệt vời!');
+        }
+        
+        // Event Listeners
+        document.getElementById('search-input').addEventListener('focus', function() {
+            document.getElementById('search-suggestions').style.display = 'block';
+        });
+
+        document.getElementById('search-input').addEventListener('blur', function() {
+            setTimeout(() => {
+                document.getElementById('search-suggestions').style.display = 'none';
+            }, 200);
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchLocation();
+            }
         });
         
-        // Fit bounds to show all markers
-        if (markers.length > 0) {
-            const group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds().pad(0.1));
-        }
-    }
+        // Add hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const facilityBtns = document.querySelectorAll('.facility-btn');
+            facilityBtns.forEach(btn => {
+                btn.style.cssText = `
+                    padding: 25px 15px;
+                    background: #f8f9fa;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-size: 16px;
+                    color: #1e3c72;
+                `;
+                
+                btn.addEventListener('mouseenter', function() {
+                    this.style.background = '#1e3c72';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.background = '#f8f9fa';
+                    this.style.color = '#1e3c72';
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
 
-    function getColorByType(type) {
-        const colors = {
-            capital: '#e74c3c',
-            unesco: '#3498db',
-            cultural: '#9b59b6',
-            city: '#2ecc71',
-            beach: '#f1c40f',
-            mountain: '#e67e22',
-            historical: '#34495e'
-        };
-        return colors[type] || '#95a5a6';
-    }
-
-    function getTypeName(type) {
-        const names = {
-            capital: 'Thủ đô',
-            unesco: 'Di sản UNESCO',
-            cultural: 'Văn hóa',
-            city: 'Thành phố',
-            beach: 'Biển',
-            mountain: 'Núi',
-            historical: 'Lịch sử'
-        };
-        return names[type] || 'Điểm tham quan';
-    }
-
-    function planTo(name, coords) {
-        alert(`✅ Đã thêm "${name}" vào lộ trình!\n\nTọa độ: ${coords[0]}, ${coords[1]}`);
-        
-        // Add to itinerary (demo)
-        const itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
-        itinerary.push({ name, coords, added: new Date().toLocaleString() });
-        localStorage.setItem('itinerary', JSON.stringify(itinerary));
-        
-        updateItineraryCount();
-    }
-
-    function updateItineraryCount() {
-        const itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
-        const count = itinerary.length;
-        
-        // Update counter in UI
-        const counter = document.getElementById('itinerary-counter');
-        if (counter) {
-            counter.textContent = count;
-            counter.style.display = count > 0 ? 'inline-block' : 'none';
-        }
-    }
-
-    // Search functionality
-    function searchLocation() {
-        const query = prompt('Tìm kiếm địa điểm:');
-        if (!query) return;
-        
-        // Simple search
-        const results = touristSpots.filter(spot => 
-            spot.name.toLowerCase().includes(query.toLowerCase())
-        );
-        
-        if (results.length > 0) {
-            // Fly to first result
-            map.flyTo(results[0].coords, 10);
+        // Initialize
+        window.onload = function() {
+            console.log('VietTravelGuide đã sẵn sàng!');
+            console.log('Điểm du lịch:', touristSpots.length);
+            console.log('Lộ trình:', userItinerary.length, 'điểm');
             
-            // Show results
-            alert(`Tìm thấy ${results.length} kết quả:\n` + 
-                  results.map(r => `• ${r.name}`).join('\n'));
-        } else {
-            alert('Không tìm thấy địa điểm phù hợp.');
-        }
-    }
-
-    // Route planning (demo)
-    function calculateRoute() {
-        const itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
-        
-        if (itinerary.length < 2) {
-            alert('Cần ít nhất 2 điểm để tính lộ trình.');
-            return;
-        }
-        
-        // Simple route calculation (demo)
-        alert(`🧮 Tính toán lộ trình cho ${itinerary.length} điểm...\n` +
-              `Tối ưu hóa thời gian và khoảng cách.\n` +
-              `Lộ trình sẽ hiển thị trên bản đồ.`);
-        
-        // Draw lines between points
-        const latlngs = itinerary.map(item => item.coords);
-        
-        // Remove existing polyline
-        if (window.routeLine) {
-            map.removeLayer(window.routeLine);
-        }
-        
-        // Add new polyline
-        window.routeLine = L.polyline(latlngs, {
-            color: '#4CAF50',
-            weight: 4,
-            opacity: 0.7,
-            dashArray: '10, 10'
-        }).addTo(map);
-        
-        // Fit bounds
-        map.fitBounds(latlngs);
-    }
-</script>
+            // Load any saved itinerary
+            if (userItinerary.length > 0) {
+                console.log('Đã tải lộ trình từ bộ nhớ:', userItinerary);
+            }
+        };
+    </script>
 </body>
 </html>
