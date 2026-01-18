@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VietTravelGuide - Du lịch thông minh Việt Nam</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Thêm Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         /* Reset và base styles */
         * {
@@ -104,7 +107,7 @@
             color: #1e3c72;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
+<div class="map-placeholder" id="map" style="height: 500px;"></div>
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
@@ -501,5 +504,196 @@
             el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         });
     </script>
+    <script>
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        loadTouristSpots();
+    });
+
+    // Vietnam coordinates
+    const vietnamCenter = [16.0, 108.0];
+    
+    // Tourist spots in Vietnam
+    const touristSpots = [
+        { name: "Hà Nội", coords: [21.0285, 105.8542], type: "capital", description: "Thủ đô Việt Nam" },
+        { name: "Vịnh Hạ Long", coords: [20.9101, 107.1839], type: "unesco", description: "Di sản thiên nhiên thế giới" },
+        { name: "Huế", coords: [16.4637, 107.5909], type: "cultural", description: "Cố đô Việt Nam" },
+        { name: "Hội An", coords: [15.8801, 108.3380], type: "unesco", description: "Phố cổ Hội An" },
+        { name: "Sài Gòn", coords: [10.8231, 106.6297], type: "city", description: "Thành phố Hồ Chí Minh" },
+        { name: "Phú Quốc", coords: [10.2236, 103.9608], type: "beach", description: "Đảo ngọc Phú Quốc" },
+        { name: "Đà Lạt", coords: [11.9465, 108.4419], type: "mountain", description: "Thành phố ngàn hoa" },
+        { name: "Nha Trang", coords: [12.2388, 109.1967], type: "beach", description: "Thành phố biển" },
+        { name: "Sapa", coords: [22.3364, 103.8441], type: "mountain", description: "Thị trấn sương mù" },
+        { name: "Cố đô Hoa Lư", coords: [20.2569, 105.9258], type: "historical", description: "Kinh đô đầu tiên" }
+    ];
+
+    let map;
+    let markers = [];
+
+    function initMap() {
+        // Create map
+        map = L.map('map').setView(vietnamCenter, 6);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // Add scale
+        L.control.scale().addTo(map);
+    }
+
+    function loadTouristSpots() {
+        // Clear existing markers
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+        
+        // Add markers for each tourist spot
+        touristSpots.forEach(spot => {
+            const marker = L.marker(spot.coords)
+                .addTo(map)
+                .bindPopup(`
+                    <div style="text-align: center;">
+                        <h3 style="margin: 0; color: #1e3c72;">${spot.name}</h3>
+                        <p style="margin: 5px 0; color: #666;">${spot.description}</p>
+                        <div style="margin: 10px 0;">
+                            <span style="background: ${getColorByType(spot.type)}; 
+                                        color: white; 
+                                        padding: 3px 10px; 
+                                        border-radius: 15px;
+                                        font-size: 12px;">
+                                ${getTypeName(spot.type)}
+                            </span>
+                        </div>
+                        <button onclick="planTo('${spot.name}', [${spot.coords}])" 
+                                style="background: #4CAF50; 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 8px 15px; 
+                                       border-radius: 5px; 
+                                       cursor: pointer;
+                                       margin-top: 5px;">
+                            Thêm vào lộ trình
+                        </button>
+                    </div>
+                `);
+            
+            markers.push(marker);
+        });
+        
+        // Fit bounds to show all markers
+        if (markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+    }
+
+    function getColorByType(type) {
+        const colors = {
+            capital: '#e74c3c',
+            unesco: '#3498db',
+            cultural: '#9b59b6',
+            city: '#2ecc71',
+            beach: '#f1c40f',
+            mountain: '#e67e22',
+            historical: '#34495e'
+        };
+        return colors[type] || '#95a5a6';
+    }
+
+    function getTypeName(type) {
+        const names = {
+            capital: 'Thủ đô',
+            unesco: 'Di sản UNESCO',
+            cultural: 'Văn hóa',
+            city: 'Thành phố',
+            beach: 'Biển',
+            mountain: 'Núi',
+            historical: 'Lịch sử'
+        };
+        return names[type] || 'Điểm tham quan';
+    }
+
+    function planTo(name, coords) {
+        alert(`✅ Đã thêm "${name}" vào lộ trình!\n\nTọa độ: ${coords[0]}, ${coords[1]}`);
+        
+        // Add to itinerary (demo)
+        const itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
+        itinerary.push({ name, coords, added: new Date().toLocaleString() });
+        localStorage.setItem('itinerary', JSON.stringify(itinerary));
+        
+        updateItineraryCount();
+    }
+
+    function updateItineraryCount() {
+        const itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
+        const count = itinerary.length;
+        
+        // Update counter in UI
+        const counter = document.getElementById('itinerary-counter');
+        if (counter) {
+            counter.textContent = count;
+            counter.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+    }
+
+    // Search functionality
+    function searchLocation() {
+        const query = prompt('Tìm kiếm địa điểm:');
+        if (!query) return;
+        
+        // Simple search
+        const results = touristSpots.filter(spot => 
+            spot.name.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        if (results.length > 0) {
+            // Fly to first result
+            map.flyTo(results[0].coords, 10);
+            
+            // Show results
+            alert(`Tìm thấy ${results.length} kết quả:\n` + 
+                  results.map(r => `• ${r.name}`).join('\n'));
+        } else {
+            alert('Không tìm thấy địa điểm phù hợp.');
+        }
+    }
+
+    // Route planning (demo)
+    function calculateRoute() {
+        const itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
+        
+        if (itinerary.length < 2) {
+            alert('Cần ít nhất 2 điểm để tính lộ trình.');
+            return;
+        }
+        
+        // Simple route calculation (demo)
+        alert(`🧮 Tính toán lộ trình cho ${itinerary.length} điểm...\n` +
+              `Tối ưu hóa thời gian và khoảng cách.\n` +
+              `Lộ trình sẽ hiển thị trên bản đồ.`);
+        
+        // Draw lines between points
+        const latlngs = itinerary.map(item => item.coords);
+        
+        // Remove existing polyline
+        if (window.routeLine) {
+            map.removeLayer(window.routeLine);
+        }
+        
+        // Add new polyline
+        window.routeLine = L.polyline(latlngs, {
+            color: '#4CAF50',
+            weight: 4,
+            opacity: 0.7,
+            dashArray: '10, 10'
+        }).addTo(map);
+        
+        // Fit bounds
+        map.fitBounds(latlngs);
+    }
+</script>
 </body>
 </html>
