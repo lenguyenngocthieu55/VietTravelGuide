@@ -46,8 +46,6 @@
 
 ## 📄 Giấy phép
 
-Dự án sử dụng **MIT License** - tự do sử dụng và phát triển
-
 ---
 
 *Cập nhật lần cuối: $(date)*
