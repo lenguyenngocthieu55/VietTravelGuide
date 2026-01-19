@@ -984,10 +984,10 @@
             map = L.map('map').setView(vietnamCenter, 6);
             
             // Sử dụng bản đồ tiếng Việt
-            L.tileLayer('https://maps.vietmap.vn/api/tm/{z}/{x}/{y}.png?apikey=5cce86f1ac463e999f21bf11d8f16813d0ac8ddf3b4c1147', {
-    attribution: '© <a href="https://vietmap.vn">VietMap</a> & © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 18
-}).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors | Bản đồ Việt Nam',
+                maxZoom: 18
+            }).addTo(map);
             
             // Thêm đảo Hoàng Sa và Trường Sa
             const hoangSa = [16.65, 112.75];
@@ -997,7 +997,7 @@
             L.marker(hoangSa, {
                 icon: L.divIcon({
                     className: 'island-marker',
-                    html: '🏝️ HOÀNG SA<br>VIỆT NAM',
+                    html: 'HOÀNG SA<br>VIỆT NAM',
                     iconSize: [120, 40]
                 })
             }).addTo(map).bindPopup('<b>QUẦN ĐẢO HOÀNG SA</b><br>Thuộc chủ quyền không thể tranh cãi của Việt Nam');
@@ -1005,18 +1005,12 @@
             L.marker(truongSa, {
                 icon: L.divIcon({
                     className: 'island-marker',
-                    html: '🏝️ TRƯỜNG SA<br>VIỆT NAM',
+                    html: ' TRƯỜNG SA<br>VIỆT NAM',
                     iconSize: [120, 40]
                 })
             }).addTo(map).bindPopup('<b>QUẦN ĐẢO TRƯỜNG SA</b><br>Thuộc chủ quyền không thể tranh cãi của Việt Nam');
             
-            // Vẽ đường biên giới Việt Nam
-            const vietnamBounds = [
-                [8.5, 102],  // Tây Nam
-                [23.5, 109], // Đông Bắc
-                [23.5, 102], // Tây Bắc
-                [8.5, 117]   // Đông Nam
-            ];
+           
             
             L.polygon(vietnamBounds, {
                 color: '#d32f2f',
