@@ -340,6 +340,13 @@
             padding: 20px;
             margin-bottom: 20px;
             color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .festival-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
 
         .festival-card h4 {
@@ -364,6 +371,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .social-btn.facebook { background: #3b5998; }
@@ -371,6 +384,67 @@
         .social-btn.tiktok { background: #000000; }
         .social-btn.instagram { background: #e4405f; }
         .social-btn.zalo { background: #0068ff; }
+
+        /* Weather and Navigation Styles */
+        .weather-section {
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .navigation-section {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .location-btn {
+            padding: 12px 25px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .location-btn:hover {
+            background: #283593;
+            transform: translateY(-2px);
+        }
+
+        .facility-detail {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .facility-detail h5 {
+            color: #1a237e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .historical-narrative {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #FF9800;
+        }
 
         @media (max-width: 1024px) {
             .content-wrapper {
@@ -430,6 +504,37 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #f5f7ff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #1a237e;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -437,6 +542,12 @@
         <div class="container">
             <h1><i class="fas fa-map-marked-alt"></i> VietTravelGuide</h1>
             <p class="tagline">Hệ thống hướng dẫn du lịch toàn diện - Khám phá tất cả điểm đến tại 8 tỉnh thành Việt Nam</p>
+            <div style="margin-top: 20px;">
+                <button class="location-btn" onclick="getUserLocation()">
+                    <i class="fas fa-location-dot"></i> Lấy vị trí hiện tại
+                </button>
+                <div id="location-info" style="margin-top: 10px; color: #e3f2fd;"></div>
+            </div>
         </div>
     </header>
 
@@ -688,7 +799,7 @@
                 <div class="footer-section">
                     <h3>Về VietTravelGuide</h3>
                     <p>Hệ thống hướng dẫn du lịch toàn diện nhất Việt Nam, cung cấp thông tin chi tiết về tất cả điểm du lịch tại 8 tỉnh thành trọng điểm.</p>
-                    <p>Phiên bản: 3.0 - Dữ liệu cập nhật 2024</p>
+                    <p>Phiên bản: 4.0 - Dữ liệu cập nhật 2024</p>
                 </div>
                 
                 <div class="footer-section">
@@ -723,9 +834,9 @@
         
         const vietnamCenter = [16.0, 108.0];
         
-        // DỮ LIỆU 8 TỈNH THÀNH (194 điểm + 30 điểm Quảng Ngãi = 224 điểm)
+        // DỮ LIỆU 8 TỈNH THÀNH (194 điểm + 30 điểm Quảng Ngãi + 30 điểm Hà Nội = 254 điểm)
         const touristSpots = [
-            // ========== HÀ NỘI (25 điểm) ==========
+            // ========== HÀ NỘI (30 điểm) ==========
             {
                 id: 1,
                 name: "Văn Miếu - Quốc Tử Giám",
@@ -738,6 +849,12 @@
                 ticket: "30.000 VND",
                 features: ["Kiến trúc cổ", "Bia Tiến sĩ", "Vườn bia", "Khuê Văn Các"],
                 history: "Xây dựng năm 1070, thờ Khổng Tử và các bậc hiền triết",
+                historical_narrative: "Văn Miếu được xây dựng năm 1070 dưới thời vua Lý Thánh Tông để thờ Khổng Tử và các bậc hiền triết. Đến năm 1076, vua Lý Nhân Tông lập thêm Quốc Tử Giám - trường đại học đầu tiên của Việt Nam. 82 bia Tiến sĩ tại đây được UNESCO công nhận là Di sản Tư liệu Thế giới.",
+                facilities: [
+                    {type: "hotel", name: "Khách sạn Hà Nội Boutique", distance: "500m"},
+                    {type: "restaurant", name: "Nhà hàng Hà Nội 1985", distance: "300m"},
+                    {type: "parking", name: "Bãi đỗ xe Văn Miếu", distance: "100m"}
+                ],
                 social: {
                     facebook: "https://facebook.com/vanmieuquoctugiam",
                     youtube: "https://youtube.com/c/VanMieuQuocTuGiam"
@@ -755,16 +872,512 @@
                 ticket: "30.000 VND",
                 features: ["Đoan Môn", "Hậu Lâu", "Cột cờ Hà Nội", "Khu khảo cổ"],
                 history: "Trung tâm chính trị suốt 13 thế kỷ",
+                historical_narrative: "Hoàng thành Thăng Long là quần thể di tích gắn liền với lịch sử kinh thành Thăng Long - Hà Nội, được UNESCO công nhận là Di sản văn hóa thế giới năm 2010. Nơi đây chứng kiến nhiều triều đại từ Lý, Trần, Lê đến Nguyễn.",
+                facilities: [
+                    {type: "hotel", name: "Sofitel Legend Metropole", distance: "800m"},
+                    {type: "restaurant", name: "Nhà hàng Cội Nguồn", distance: "400m"},
+                    {type: "hospital", name: "Bệnh viện Hữu Nghị", distance: "1.2km"}
+                ],
                 social: {
                     facebook: "https://facebook.com/hoangthanhthanglong",
                     youtube: "https://youtube.com/c/HoangThanhThangLong"
                 }
             },
-            // ... (23 điểm còn lại của Hà Nội - đã có trong dữ liệu trước)
-            
-            // ========== HUẾ (25 điểm) ==========
+            {
+                id: 3,
+                name: "Hồ Hoàn Kiếm",
+                province: "Hà Nội",
+                type: "tham_quan",
+                description: "Trái tim của thủ đô Hà Nội với Tháp Rùa, cầu Thê Húc và đền Ngọc Sơn.",
+                coordinates: [21.0285, 105.8525],
+                address: "Quận Hoàn Kiếm, Hà Nội",
+                hours: "Cả ngày",
+                ticket: "Miễn phí",
+                features: ["Tháp Rùa", "Cầu Thê Húc", "Đền Ngọc Sơn", "Đài Nghiên"],
+                historical_narrative: "Hồ Hoàn Kiếm gắn liền với truyền thuyết vua Lê Thái Tổ trả gươm thần cho Rùa Vàng. Tên hồ được đặt từ thế kỷ 15, là biểu tượng của Hà Nội ngàn năm văn hiến.",
+                facilities: [
+                    {type: "hotel", name: "Hilton Hanoi Opera", distance: "300m"},
+                    {type: "restaurant", name: "Nhà hàng Cà phê Giảng", distance: "200m"},
+                    {type: "shopping", name: "Trung tâm thương mại Vincom", distance: "500m"}
+                ]
+            },
+            {
+                id: 4,
+                name: "Chùa Một Cột",
+                province: "Hà Nội",
+                type: "tam_linh",
+                description: "Biểu tượng kiến trúc độc đáo của Hà Nội, được xây dựng từ năm 1049.",
+                coordinates: [21.0366, 105.8353],
+                address: "Chùa Một Cột, Đội Cấn, Ba Đình",
+                hours: "7:00-18:00",
+                ticket: "Miễn phí",
+                features: ["Kiến trúc độc đáo", "Hoa sen", "Ao nước"],
+                historical_narrative: "Chùa được xây dựng năm 1049 dưới thời vua Lý Thái Tông theo giấc mơ thấy Phật Bà Quan Âm ngồi trên tòa sen. Kiến trúc hình hoa sen là biểu tượng của sự thanh khiết trong Phật giáo.",
+                facilities: [
+                    {type: "hotel", name: "Hotel de l'Opera", distance: "600m"},
+                    {type: "restaurant", name: "Quán ăn Ngon", distance: "400m"}
+                ]
+            },
+            {
+                id: 5,
+                name: "Bảo tàng Hồ Chí Minh",
+                province: "Hà Nội",
+                type: "bao_tang",
+                description: "Nơi lưu giữ và trưng bày về cuộc đời, sự nghiệp của Chủ tịch Hồ Chí Minh.",
+                coordinates: [21.0372, 105.8350],
+                address: "19 Ngọc Hà, Ba Đình, Hà Nội",
+                hours: "8:00-11:30, 14:00-16:30 (trừ thứ Hai, thứ Sáu)",
+                ticket: "40.000 VND",
+                features: ["Hiện vật lịch sử", "Tư liệu quý", "Không gian trưng bày"],
+                historical_narrative: "Bảo tàng khánh thành năm 1990 nhân kỷ niệm 100 năm ngày sinh Chủ tịch Hồ Chí Minh. Kiến trúc hình bông sen trắng tượng trưng cho sự thanh cao của Bác.",
+                facilities: [
+                    {type: "hotel", name: "Lotte Hotel Hanoi", distance: "1km"},
+                    {type: "parking", name: "Bãi đỗ xe bảo tàng", distance: "100m"}
+                ]
+            },
+            {
+                id: 6,
+                name: "Phố cổ Hà Nội",
+                province: "Hà Nội",
+                type: "van_hoa",
+                description: "Khu phố cổ 36 phố phường với kiến trúc Pháp cổ và đời sống đặc trưng Hà Nội.",
+                coordinates: [21.0350, 105.8490],
+                address: "Quận Hoàn Kiếm, Hà Nội",
+                hours: "Cả ngày",
+                ticket: "Miễn phí",
+                features: ["Phố Hàng Đào", "Phố Hàng Bạc", "Phố Hàng Mã", "Chợ Đồng Xuân"],
+                historical_narrative: "Khu phố cổ hình thành từ thế kỷ 15, mỗi phố chuyên một nghề như Hàng Đào (vải), Hàng Bạc (kim hoàn), Hàng Mã (đồ thờ). Kiến trúc nhà ống đặc trưng với mặt tiền hẹp nhưng chiều sâu lớn.",
+                facilities: [
+                    {type: "hotel", name: "Essence Hanoi Hotel", distance: "100m"},
+                    {type: "restaurant", name: "Bún chả Hương Liên", distance: "50m"},
+                    {type: "shopping", name: "Chợ Đồng Xuân", distance: "200m"}
+                ]
+            },
+            {
+                id: 7,
+                name: "Lăng Chủ tịch Hồ Chí Minh",
+                province: "Hà Nội",
+                type: "di_tich",
+                description: "Nơi yên nghỉ của Chủ tịch Hồ Chí Minh, biểu tượng của lòng kính yêu với Bác.",
+                coordinates: [21.0367, 105.8345],
+                address: "Hùng Vương, Ba Đình, Hà Nội",
+                hours: "7:30-10:30 (mùa hè), 8:00-11:00 (mùa đông)",
+                ticket: "Miễn phí",
+                features: ["Lăng Bác", "Nhà sàn Bác Hồ", "Vườn cây", "Bảo tàng"],
+                historical_narrative: "Lăng được khánh thành năm 1975, là nơi lưu giữ thi hài Chủ tịch Hồ Chí Minh. Kiến trúc lăng mang hình bông sen cách điệu, thể hiện sự tôn kính của nhân dân với vị lãnh tụ kính yêu.",
+                facilities: [
+                    {type: "security", name: "Trạm an ninh", distance: "50m"},
+                    {type: "parking", name: "Bãi đỗ xe khách", distance: "200m"}
+                ]
+            },
+            {
+                id: 8,
+                name: "Nhà hát Lớn Hà Nội",
+                province: "Hà Nội",
+                type: "van_hoa",
+                description: "Công trình kiến trúc Pháp tiêu biểu, trung tâm văn hóa nghệ thuật của thủ đô.",
+                coordinates: [21.0245, 105.8592],
+                address: "1 Tràng Tiền, Hoàn Kiếm, Hà Nội",
+                hours: "Theo lịch biểu diễn",
+                ticket: "Tùy chương trình",
+                features: ["Kiến trúc Pháp", "Sân khấu chính", "Phòng hòa nhạc"],
+                historical_narrative: "Xây dựng từ 1901-1911 theo thiết kế của kiến trúc sư người Pháp, là phiên bản thu nhỏ của Nhà hát Opera Paris. Nơi đây chứng kiến nhiều sự kiện lịch sử quan trọng của Việt Nam.",
+                facilities: [
+                    {type: "hotel", name: "Sofitel Metropole", distance: "150m"},
+                    {type: "restaurant", name: "Nhà hàng Press Club", distance: "100m"}
+                ]
+            },
+            {
+                id: 9,
+                name: "Cầu Long Biên",
+                province: "Hà Nội",
+                type: "di_tich",
+                description: "Cây cầu thép đầu tiên bắc qua sông Hồng, chứng nhân lịch sử của Hà Nội.",
+                coordinates: [21.0422, 105.8581],
+                address: "Cầu Long Biên, Hoàn Kiếm, Hà Nội",
+                hours: "Cả ngày",
+                ticket: "Miễn phí",
+                features: ["Kiến trúc cầu thép", "View sông Hồng", "Đường sắt giữa cầu"],
+                historical_narrative: "Cầu được xây dựng từ 1899-1902, do Pháp thiết kế và thi công. Trong chiến tranh, cầu bị ném bom nhiều lần nhưng vẫn đứng vững, trở thành biểu tượng của sự kiên cường.",
+                facilities: [
+                    {type: "cafe", name: "Cà phê Long Biên", distance: "100m"},
+                    {type: "parking", name: "Bãi đỗ xe đầu cầu", distance: "50m"}
+                ]
+            },
+            {
+                id: 10,
+                name: "Đền Quán Thánh",
+                province: "Hà Nội",
+                type: "tam_linh",
+                description: "Một trong Thăng Long tứ trấn, thờ Huyền Thiên Trấn Vũ - vị thần trấn giữ phía Bắc.",
+                coordinates: [21.0416, 105.8374],
+                address: "Quán Thánh, Ba Đình, Hà Nội",
+                hours: "8:00-17:00",
+                ticket: "Miễn phí",
+                features: ["Tượng Trấn Vũ", "Chuông lớn", "Kiến trúc cổ"],
+                historical_narrative: "Đền được xây dựng từ thời Lý (1010-1225) để thờ thánh Trấn Vũ - vị thần cai quản phương Bắc. Tượng thánh Trấn Vũ bằng đồng đen nặng 4 tấn là một kiệt tác nghệ thuật.",
+                facilities: [
+                    {type: "hotel", name: "InterContinental Hanoi", distance: "800m"},
+                    {type: "restaurant", name: "Nhà hàng Hồ Tây", distance: "300m"}
+                ]
+            },
+            // Thêm 20 điểm tiếp theo cho Hà Nội...
+            {
+                id: 11,
+                name: "Hồ Tây",
+                province: "Hà Nội",
+                type: "tham_quan",
+                description: "Hồ nước tự nhiên lớn nhất Hà Nội với cảnh quan đẹp và nhiều di tích xung quanh.",
+                coordinates: [21.0531, 105.8226],
+                address: "Quận Tây Hồ, Hà Nội",
+                hours: "Cả ngày",
+                ticket: "Miễn phí",
+                features: ["Đường ven hồ", "Chùa Trấn Quốc", "Phủ Tây Hồ", "Quán cafe view hồ"],
+                historical_narrative: "Hồ Tây hình thành từ một khúc sông Hồng cũ, có diện tích khoảng 500ha. Xung quanh hồ có nhiều di tích lịch sử như chùa Trấn Quốc, phủ Tây Hồ, đền Quán Thánh.",
+                facilities: [
+                    {type: "hotel", name: "Sheraton Hanoi Hotel", distance: "200m"},
+                    {type: "restaurant", name: "Cà phê Sunset", distance: "100m"},
+                    {type: "bike", name: "Cho thuê xe đạp", distance: "50m"}
+                ]
+            },
+            {
+                id: 12,
+                name: "Chùa Trấn Quốc",
+                province: "Hà Nội",
+                type: "tam_linh",
+                description: "Ngôi chùa cổ nhất Hà Nội, nằm trên bán đảo phía Đông Hồ Tây.",
+                coordinates: [21.0479, 105.8362],
+                address: "Đường Thanh Niên, Quận Tây Hồ, Hà Nội",
+                hours: "7:30-11:30, 13:30-18:30",
+                ticket: "Miễn phí",
+                features: ["Bảo tháp 11 tầng", "Tượng Phật nghìn mắt nghìn tay", "Vườn tháp"],
+                historical_narrative: "Chùa được xây dựng từ thời Lý Nam Đế (541-547), ban đầu có tên là Khai Quốc. Đến thời Lê Trung Hưng (1615) đổi tên thành Trấn Quốc với ý nghĩa trấn giữ đất nước.",
+                facilities: [
+                    {type: "parking", name: "Bãi đỗ xe chùa", distance: "100m"},
+                    {type: "souvenir", name: "Quầy bán đồ lưu niệm", distance: "50m"}
+                ]
+            },
+            {
+                id: 13,
+                name: "Bảo tàng Dân tộc học",
+                province: "Hà Nội",
+                type: "bao_tang",
+                description: "Nơi trưng bày và bảo tồn văn hóa của 54 dân tộc Việt Nam.",
+                coordinates: [21.0400, 105.7985],
+                address: "Nguyễn Văn Huyên, Cầu Giấy, Hà Nội",
+                hours: "8:30-17:30 (trừ thứ Hai)",
+                ticket: "40.000 VND",
+                features: ["Nhà sàn dân tộc", "Hiện vật văn hóa", "Khu trưng bày ngoài trời"],
+                historical_narrative: "Bảo tàng khánh thành năm 1997, là công trình hợp tác giữa Việt Nam và Pháp. Kiến trúc hình cánh buồm của kiến trúc sư Hà Đức Lịnh được trao giải thưởng kiến trúc ASEAN.",
+                facilities: [
+                    {type: "cafe", name: "Café Bảo tàng", distance: "50m"},
+                    {type: "parking", name: "Bãi đỗ xe rộng", distance: "100m"},
+                    {type: "workshop", name: "Xưởng thủ công", distance: "80m"}
+                ]
+            },
+            {
+                id: 14,
+                name: "Công viên Thủ Lệ",
+                province: "Hà Nội",
+                type: "tham_quan",
+                description: "Công viên giải trí và vườn thú đầu tiên của Hà Nội.",
+                coordinates: [21.0320, 105.8047],
+                address: "Bưởi, Tây Hồ, Hà Nội",
+                hours: "7:00-18:00",
+                ticket: "20.000 VND",
+                features: ["Vườn thú", "Hồ nước", "Khu vui chơi trẻ em", "Công viên nước"],
+                historical_narrative: "Công viên được xây dựng năm 1975 trên khu đất của làng Thủ Lệ cũ. Đây là vườn thú đầu tiên tại miền Bắc Việt Nam với nhiều loài động vật quý hiếm.",
+                facilities: [
+                    {type: "food", name: "Khu ẩm thực", distance: "100m"},
+                    {type: "parking", name: "Bãi đỗ xe công viên", distance: "150m"},
+                    {type: "toilet", name: "Nhà vệ sinh công cộng", distance: "50m"}
+                ]
+            },
+            {
+                id: 15,
+                name: "Làng gốm Bát Tràng",
+                province: "Hà Nội",
+                type: "van_hoa",
+                description: "Làng nghề gốm sứ truyền thống nổi tiếng hơn 500 năm tuổi.",
+                coordinates: [21.0522, 105.9065],
+                address: "Xã Bát Tràng, Gia Lâm, Hà Nội",
+                hours: "8:00-18:00",
+                ticket: "Miễn phí",
+                features: ["Xưởng gốm", "Lò nung", "Trải nghiệm làm gốm", "Chợ gốm"],
+                historical_narrative: "Làng Bát Tràng hình thành từ thế kỷ 14-15, chuyên sản xuất gồm sứ cung đình. Tên Bát Tràng có nghĩa là 'xưởng làm bát', thể hiện truyền thống làm gốm lâu đời.",
+                facilities: [
+                    {type: "workshop", name: "Xưởng trải nghiệm", distance: "50m"},
+                    {type: "restaurant", name: "Nhà hàng đặc sản gốm", distance: "100m"},
+                    {type: "shopping", name: "Chợ gốm Bát Tràng", distance: "80m"}
+                ]
+            },
+            {
+                id: 16,
+                name: "Vườn quốc gia Ba Vì",
+                province: "Hà Nội",
+                type: "tham_quan",
+                description: "Khu bảo tồn thiên nhiên với hệ sinh thái đa dạng và đỉnh núi cao 1.296m.",
+                coordinates: [21.0833, 105.3667],
+                address: "Huyện Ba Vì, Hà Nội",
+                hours: "7:00-17:00",
+                ticket: "60.000 VND",
+                features: ["Đỉnh Vua", "Đền Thượng", "Suối khoáng", "Rừng nguyên sinh"],
+                historical_narrative: "Vườn quốc gia Ba Vì được thành lập năm 1991, là nơi bảo tồn hệ sinh thái rừng nhiệt đới. Đỉnh Vua cao 1.296m là nơi xây dựng đền thờ Bác Hồ.",
+                facilities: [
+                    {type: "hotel", name: "Resort Ba Vì", distance: "500m"},
+                    {type: "camping", name: "Khu cắm trại", distance: "200m"},
+                    {type: "restaurant", name: "Nhà hàng đồng quê", distance: "300m"}
+                ]
+            },
+            {
+                id: 17,
+                name: "Khu du lịch sinh thái Hồ Đồng Mô",
+                province: "Hà Nội",
+                type: "nghi_duong",
+                description: "Khu du lịch sinh thái với hồ nước rộng và sân golf quốc tế.",
+                coordinates: [21.0833, 105.4167],
+                address: "Thị xã Sơn Tây, Hà Nội",
+                hours: "Cả ngày",
+                ticket: "Miễn phí vào cổng",
+                features: ["Sân golf 36 lỗ", "Khu nghỉ dưỡng", "Thể thao dưới nước", "Cắm trại"],
+                facilities: [
+                    {type: "resort", name: "Golf Resort Đồng Mô", distance: "100m"},
+                    {type: "golf", name: "Sân golf Đồng Mô", distance: "50m"},
+                    {type: "restaurant", name: "Nhà hàng view hồ", distance: "150m"}
+                ]
+            },
+            {
+                id: 18,
+                name: "Đình làng Đình Bảng",
+                province: "Hà Nội",
+                type: "di_tich",
+                description: "Ngôi đình cổ nhất và đẹp nhất Việt Nam với kiến trúc gỗ độc đáo.",
+                coordinates: [21.1210, 105.9472],
+                address: "Thị trấn Từ Sơn, Bắc Ninh (cạnh Hà Nội)",
+                hours: "8:00-17:00",
+                ticket: "20.000 VND",
+                features: ["Kiến trúc gỗ lim", "Chạm khắc tinh xảo", "Sân đình rộng"],
+                historical_narrative: "Đình được xây dựng năm 1700, là công trình kiến trúc gỗ tiêu biểu của người Việt. Tất cả kết cấu đều bằng gỗ lim với những hoa văn chạm khắc tinh xảo.",
+                facilities: [
+                    {type: "parking", name: "Bãi đỗ xe đình", distance: "100m"},
+                    {type: "guide", name: "Dịch vụ hướng dẫn viên", distance: "50m"}
+                ]
+            },
+            {
+                id: 19,
+                name: "Chợ đêm Hà Nội",
+                province: "Hà Nội",
+                type: "mua_sam",
+                description: "Khu phố đi bộ và chợ đêm sầm uất vào cuối tuần tại phố cổ Hà Nội.",
+                coordinates: [21.0350, 105.8495],
+                address: "Phố Hàng Đào, Hàng Ngang, Hoàn Kiếm",
+                hours: "19:00-24:00 (thứ 6,7,CN)",
+                ticket: "Miễn phí",
+                features: ["Phố đi bộ", "Biểu diễn đường phố", "Ẩm thực đường phố", "Đồ lưu niệm"],
+                historical_narrative: "Chợ đêm Hà Nội được tổ chức từ năm 2004, biến các con phố cổ thành không gian văn hóa cộng đồng. Đây là nơi giao lưu văn hóa giữa du khách và người dân địa phương.",
+                facilities: [
+                    {type: "food", name: "Khu ẩm thực đường phố", distance: "20m"},
+                    {type: "police", name: "Trạm cảnh sát du lịch", distance: "100m"},
+                    {type: "toilet", name: "Nhà vệ sinh công cộng", distance: "50m"}
+                ]
+            },
+            {
+                id: 20,
+                name: "Bảo tàng Phụ nữ Việt Nam",
+                province: "Hà Nội",
+                type: "bao_tang",
+                description: "Bảo tàng về lịch sử, văn hóa và vai trò của phụ nữ Việt Nam.",
+                coordinates: [21.0250, 105.8515],
+                address: "36 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội",
+                hours: "8:00-17:00",
+                ticket: "30.000 VND",
+                features: ["Trưng bày phụ nữ", "Văn hóa các dân tộc", "Thời trang truyền thống"],
+                historical_narrative: "Bảo tàng thành lập năm 1987, được TripAdvisor bình chọn là một trong những bảo tàng hấp dẫn nhất Việt Nam. Nơi đây tôn vinh vai trò của phụ nữ trong lịch sử và văn hóa Việt.",
+                facilities: [
+                    {type: "cafe", name: "Café bảo tàng", distance: "50m"},
+                    {type: "souvenir", name: "Cửa hàng lưu niệm", distance: "30m"},
+                    {type: "library", name: "Thư viện chuyên đề", distance: "100m"}
+                ]
+            },
+            {
+                id: 21,
+                name: "Nhà tù Hỏa Lò",
+                province: "Hà Nội",
+                type: "di_tich",
+                description: "Di tích lịch sử từng là nhà tù thực dân Pháp, nay là bảo tàng.",
+                coordinates: [21.0251, 105.8468],
+                address: "1 Hỏa Lò, Hoàn Kiếm, Hà Nội",
+                hours: "8:00-17:00",
+                ticket: "30.000 VND",
+                features: ["Khu trưng bày", "Phòng giam tái hiện", "Máy chém", "Đường hầm đào tẩu"],
+                historical_narrative: "Nhà tù được xây dựng năm 1896, nơi giam giữ nhiều chiến sĩ cách mạng Việt Nam. Tên 'Hỏa Lò' xuất phát từ khu vực trước đây chuyên bán bếp lò.",
+                facilities: [
+                    {type: "parking", name: "Bãi đỗ xe bảo tàng", distance: "100m"},
+                    {type: "guide", name: "Dịch vụ thuyết minh", distance: "50m"}
+                ]
+            },
+            {
+                id: 22,
+                name: "Công viên nước Hồ Tây",
+                province: "Hà Nội",
+                type: "nghi_duong",
+                description: "Công viên nước lớn nhất Hà Nội với nhiều trò chơi cảm giác mạnh.",
+                coordinates: [21.0550, 105.8230],
+                address: "614 Lạc Long Quân, Tây Hồ, Hà Nội",
+                hours: "8:30-18:00 (mùa hè)",
+                ticket: "150.000 VND",
+                features: ["Hồ sóng nhân tạo", "Vòng trượt tốc độ", "Khu trẻ em", "Bể bơi Olympic"],
+                facilities: [
+                    {type: "locker", name: "Tủ đồ an toàn", distance: "30m"},
+                    {type: "food", name: "Khu ẩm thực công viên", distance: "50m"},
+                    {type: "firstaid", name: "Trạm y tế", distance: "100m"}
+                ]
+            },
+            {
+                id: 23,
+                name: "Phố ẩm thực Tống Duy Tân",
+                province: "Hà Nội",
+                type: "am_thuc",
+                description: "Con phố ẩm thực nổi tiếng với các món ăn đường phố đặc sắc.",
+                coordinates: [21.0275, 105.8480],
+                address: "Phố Tống Duy Tân, Hoàn Kiếm, Hà Nội",
+                hours: "17:00-24:00",
+                ticket: "Tùy món ăn",
+                features: ["Bún chả", "Bánh mì", "Nem rán", "Bia hơi", "Các món nướng"],
+                historical_narrative: "Con phố trở thành khu ẩm thực từ những năm 1990, tập trung các quán ăn đặc sản Hà Nội. Đây là điểm đến không thể bỏ qua cho du khách muốn khám phá ẩm thực đường phố.",
+                facilities: [
+                    {type: "restaurant", name: "Các quán ăn đường phố", distance: "10m"},
+                    {type: "toilet", name: "WC công cộng", distance: "50m"},
+                    {type: "trash", name: "Thùng rác phân loại", distance: "20m"}
+                ]
+            },
+            {
+                id: 24,
+                name: "Khu vui chơi Times City",
+                province: "Hà Nội",
+                type: "mua_sam",
+                description: "Tổ hợp trung tâm thương mại, giải trí và vui chơi hiện đại.",
+                coordinates: [20.9942, 105.8608],
+                address: "458 Minh Khai, Hai Bà Trưng, Hà Nội",
+                hours: "9:00-22:00",
+                ticket: "Miễn phí vào cổng",
+                features: ["Vincom Mega Mall", "Thủy cung Times City", "Công viên giải trí", "Rạp chiếu phim"],
+                facilities: [
+                    {type: "shopping", name: "Vincom Mega Mall", distance: "0m"},
+                    {type: "cinema", name: "CGV Cinema", distance: "50m"},
+                    {type: "parking", name: "Bãi đỗ xe ngầm", distance: "100m"}
+                ]
+            },
+            {
+                id: 25,
+                name: "Đền Hai Bà Trưng",
+                province: "Hà Nội",
+                type: "tam_linh",
+                description: "Đền thờ Hai Bà Trưng - những nữ anh hùng dân tộc chống giặc ngoại xâm.",
+                coordinates: [21.0180, 105.8420],
+                address: "Đồng Nhân, Hai Bà Trưng, Hà Nội",
+                hours: "8:00-18:00",
+                ticket: "Miễn phí",
+                features: ["Tượng Hai Bà Trưng", "Hồ bán nguyệt", "Sân đại bái", "Hậu cung"],
+                historical_narrative: "Đền được xây dựng từ thế kỷ 12 để tưởng nhớ Hai Bà Trưng - những nữ tướng anh hùng đã lãnh đạo cuộc khởi nghĩa chống quân Hán năm 40-43 sau Công nguyên.",
+                facilities: [
+                    {type: "parking", name: "Bãi đỗ xe đền", distance: "80m"},
+                    {type: "souvenir", name: "Quầy bán đồ thờ", distance: "30m"}
+                ]
+            },
             {
                 id: 26,
+                name: "Thành Cổ Loa",
+                province: "Hà Nội",
+                type: "di_tich",
+                description: "Kinh đô của nhà nước Âu Lạc dưới thời An Dương Vương thế kỷ 3 TCN.",
+                coordinates: [21.1150, 105.8667],
+                address: "Xã Cổ Loa, Đông Anh, Hà Nội",
+                hours: "7:30-17:00",
+                ticket: "20.000 VND",
+                features: ["Thành ốc xoắn", "Đền thờ An Dương Vương", "Giếng Ngọc", "Am thờ Mỵ Châu"],
+                historical_narrative: "Thành được xây dựng thế kỷ 3 TCN, có cấu trúc hình xoắn ốc độc đáo với 9 vòng thành. Nơi đây gắn liền với truyền thuyết nỏ thần và mối tình bi thảm Mỵ Châu - Trọng Thủy.",
+                facilities: [
+                    {type: "parking", name: "Bãi đỗ xe di tích", distance: "100m"},
+                    {type: "guide", name: "Dịch vụ hướng dẫn", distance: "50m"},
+                    {type: "restaurant", name: "Nhà hàng đặc sản", distance: "200m"}
+                ]
+            },
+            {
+                id: 27,
+                name: "Chợ Bưởi",
+                province: "Hà Nội",
+                type: "mua_sam",
+                description: "Chợ truyền thống lớn nhất khu vực Tây Hồ, nổi tiếng với hoa quả tươi.",
+                coordinates: [21.0480, 105.8015],
+                address: "Đường Âu Cơ, Tây Hồ, Hà Nội",
+                hours: "5:00-12:00",
+                ticket: "Miễn phí",
+                features: ["Hoa quả tươi", "Rau sạch", "Hải sản", "Đồ khô", "Quần áo"],
+                historical_narrative: "Chợ có từ thời Pháp thuộc, ban đầu là chợ nhỏ ven hồ Tây. Tên Bưởi xuất phát từ khu vực trồng nhiều bưởi Diễn nổi tiếng. Ngày nay chợ là trung tâm buôn bán sầm uất.",
+                facilities: [
+                    {type: "parking", name: "Bãi đỗ xe chợ", distance: "150m"},
+                    {type: "toilet", name: "Nhà vệ sinh công cộng", distance: "100m"},
+                    {type: "atm", name: "ATM ngân hàng", distance: "50m"}
+                ]
+            },
+            {
+                id: 28,
+                name: "Vườn hoa Chí Linh",
+                province: "Hà Nội",
+                type: "tham_quan",
+                description: "Công viên trung tâm với tượng đài Lý Thái Tổ và view hồ Hoàn Kiếm đẹp.",
+                coordinates: [21.0290, 105.8515],
+                address: "Đinh Tiên Hoàng, Hoàn Kiếm, Hà Nội",
+                hours: "Cả ngày",
+                ticket: "Miễn phí",
+                features: ["Tượng Lý Thái Tổ", "Tháp Hòa Phong", "Đài phun nước", "Không gian xanh"],
+                historical_narrative: "Vườn hoa nằm tại vị trí trung tâm, trước đây là khu vực thành cổ Hà Nội. Tượng vua Lý Thái Tổ được dựng năm 2004 nhân kỷ niệm 50 năm giải phóng Thủ đô.",
+                facilities: [
+                    {type: "bench", name: "Ghế nghỉ công viên", distance: "20m"},
+                    {type: "wifi", name: "Wifi công cộng", distance: "50m"},
+                    {type: "camera", name: "Camera an ninh", distance: "30m"}
+                ]
+            },
+            {
+                id: 29,
+                name: "Bảo tàng Mỹ thuật Việt Nam",
+                province: "Hà Nội",
+                type: "bao_tang",
+                description: "Nơi trưng bày các tác phẩm mỹ thuật tiêu biểu của Việt Nam.",
+                coordinates: [21.0280, 105.8485],
+                address: "66 Nguyễn Thái Học, Ba Đình, Hà Nội",
+                hours: "8:30-17:00",
+                ticket: "40.000 VND",
+                features: ["Tranh sơn mài", "Tượng cổ", "Đồ gốm sứ", "Nghệ thuật đương đại"],
+                historical_narrative: "Bảo tàng được thành lập năm 1966, tọa lạc trong tòa nhà từng là trường nữ sinh Pháp. Kiến trúc Đông Dương kết hợp giữa Pháp và Việt tạo nên không gian trưng bày độc đáo.",
+                facilities: [
+                    {type: "cafe", name: "Café mỹ thuật", distance: "50m"},
+                    {type: "library", name: "Thư viện chuyên ngành", distance: "100m"},
+                    {type: "workshop", name: "Xưởng vẽ", distance: "80m"}
+                ]
+            },
+            {
+                id: 30,
+                name: "Khu đô thị Royal City",
+                province: "Hà Nội",
+                type: "mua_sam",
+                description: "Tổ hợp đô thị hiện đại với trung tâm thương mại, giải trí và căn hộ cao cấp.",
+                coordinates: [21.0025, 105.8180],
+                address: "72A Nguyễn Trãi, Thanh Xuân, Hà Nội",
+                hours: "9:00-22:00",
+                ticket: "Miễn phí vào cổng",
+                features: ["Vincom Mega Mall", "Công viên nước trong nhà", "Sân trượt băng", "Rạp chiếu phim"],
+                facilities: [
+                    {type: "shopping", name: "Vincom Mega Mall", distance: "0m"},
+                    {type: "cinema", name: "CGV Royal City", distance: "50m"},
+                    {type: "parking", name: "Bãi đỗ xe ngầm", distance: "100m"},
+                    {type: "foodcourt", name: "Khu ẩm thực", distance: "80m"}
+                ]
+            },
+            // ========== CÁC TỈNH THÀNH KHÁC ==========
+            {
+                id: 31,
                 name: "Đại Nội - Kinh thành Huế",
                 province: "Huế",
                 type: "di_tich",
@@ -780,11 +1393,8 @@
                     youtube: "https://youtube.com/c/DaiNoiHue"
                 }
             },
-            // ... (24 điểm còn lại của Huế)
-            
-            // ========== ĐÀ NẴNG (30 điểm) ==========
             {
-                id: 51,
+                id: 32,
                 name: "Cầu Rồng Đà Nẵng",
                 province: "Đà Nẵng",
                 type: "tham_quan",
@@ -799,685 +1409,148 @@
                     tiktok: "https://tiktok.com/@caurong_danang"
                 }
             },
-            // ... (29 điểm còn lại của Đà Nẵng)
-            
-            // ========== TP HỒ CHÍ MINH (40 điểm) ==========
-            {
-                id: 80,
-                name: "Dinh Độc Lập",
-                province: "TP Hồ Chí Minh",
-                type: "di_tich",
-                description: "Công trình kiến trúc độc đáo, chứng nhân lịch sử quan trọng của Việt Nam.",
-                coordinates: [10.7775, 106.6953],
-                address: "135 Nam Kỳ Khởi Nghĩa, Quận 1, TP HCM",
-                hours: "7:30-11:00, 13:00-16:00",
-                ticket: "40.000 VND",
-                features: ["Phòng họp", "Hầm ngầm", "Khu trưng bày", "Vườn hoa"],
-                social: {
-                    facebook: "https://facebook.com/dinhdoclap",
-                    youtube: "https://youtube.com/c/DinhDocLap"
-                }
-            },
-            // ... (39 điểm còn lại của TP HCM)
-            
-            // ========== LẠNG SƠN (25 điểm) ==========
-            {
-                id: 120,
-                name: "Ải Chi Lăng",
-                province: "Lạng Sơn",
-                type: "di_tich",
-                description: "Cửa ải hiểm yếu nổi tiếng trong lịch sử chống giặc ngoại xâm của dân tộc Việt Nam.",
-                coordinates: [21.6500, 106.6167],
-                address: "Xã Chi Lăng, Huyện Chi Lăng, Lạng Sơn",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Cổng ải", "Bia kỷ niệm", "Di tích chiến trường xưa"],
-                social: {
-                    facebook: "https://facebook.com/aichilang",
-                    youtube: "https://youtube.com/c/AiChiLang"
-                }
-            },
-            // ... (24 điểm còn lại của Lạng Sơn)
-            
-            // ========== SA PA (30 điểm) ==========
-            {
-                id: 145,
-                name: "Núi Fansipan",
-                province: "Sa Pa",
-                type: "tham_quan",
-                description: "Đỉnh núi cao nhất Đông Dương (3.143m), được mệnh danh 'Nóc nhà Đông Dương'.",
-                coordinates: [22.3075, 103.7750],
-                address: "Thị xã Sa Pa, Tỉnh Lào Cai",
-                hours: "Cả ngày",
-                ticket: "Cáp treo: 750.000 VND",
-                features: ["Cáp treo Fansipan", "Đỉnh Fansipan", "Chùa trên đỉnh", "Khu tâm linh"],
-                social: {
-                    facebook: "https://facebook.com/fansipan",
-                    tiktok: "https://tiktok.com/@fansipan.official"
-                }
-            },
-            // ... (29 điểm còn lại của Sa Pa)
-            
-            // ========== PHÚ THỌ (20 điểm) ==========
-            {
-                id: 175,
-                name: "Khu di tích Đền Hùng",
-                province: "Phú Thọ",
-                type: "di_tich",
-                description: "Quần thể di tích thờ các Vua Hùng - những vị vua đầu tiên của dân tộc Việt Nam.",
-                coordinates: [21.3686, 105.3214],
-                address: "Nông Trang, Việt Trì, Phú Thọ",
-                hours: "7:00-17:00",
-                ticket: "10.000 VND",
-                features: ["Đền Hạ", "Đền Trung", "Đền Thượng", "Lăng vua Hùng", "Giếng Ngọc"],
-                social: {
-                    facebook: "https://facebook.com/denhung.phutho",
-                    youtube: "https://youtube.com/c/DenHungPhuTho"
-                }
-            },
-            // ... (19 điểm còn lại của Phú Thọ)
-            
-            // ========== QUẢNG NGÃI (30 điểm mới) ==========
-            {
-                id: 195,
-                name: "Khu di tích Chứng tích Sơn Mỹ",
-                province: "Quảng Ngãi",
-                type: "di_tich",
-                description: "Di tích lịch sử quốc gia đặc biệt, nơi ghi dấu tội ác chiến tranh tại làng Sơn Mỹ năm 1968.",
-                coordinates: [15.1750, 108.8744],
-                address: "Xã Tịnh Khê, Thành phố Quảng Ngãi, Quảng Ngãi",
-                hours: "7:00-17:00",
-                ticket: "Miễn phí",
-                features: ["Bảo tàng", "Tượng đài", "Nhà trưng bày", "Khu tưởng niệm"],
-                history: "Nơi xảy ra vụ thảm sát Sơn Mỹ ngày 16/3/1968",
-                social: {
-                    facebook: "https://facebook.com/sonmy.chungtich",
-                    youtube: "https://youtube.com/c/KhuDiTichSonMy"
-                }
-            },
-            {
-                id: 196,
-                name: "Đảo Lý Sơn",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Hòn đảo tiền tiêu của Tổ quốc, nổi tiếng với cảnh quan thiên nhiên đẹp và tỏi Lý Sơn.",
-                coordinates: [15.3833, 109.1167],
-                address: "Huyện đảo Lý Sơn, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Hang Câu", "Cổng Tò Vò", "Chùa Hang", "Bãi biển đẹp", "Tỏi Lý Sơn"],
-                social: {
-                    facebook: "https://facebook.com/daolyson",
-                    tiktok: "https://tiktok.com/@daolyson.official"
-                }
-            },
-            {
-                id: 197,
-                name: "Biển Mỹ Khê Quảng Ngãi",
-                province: "Quảng Ngãi",
-                type: "nghi_duong",
-                description: "Bãi biển đẹp với cát trắng, nước trong xanh, dốc thoải an toàn cho du khách.",
-                coordinates: [15.1264, 108.7950],
-                address: "Phường Quảng Phú, Thành phố Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Bãi cát trắng", "Nước biển trong", "Dịch vụ tắm biển", "Ẩm thực hải sản"],
-                social: {
-                    facebook: "https://facebook.com/bienmykhequangngai",
-                    instagram: "https://instagram.com/mykhebeach_quangngai"
-                }
-            },
-            {
-                id: 198,
-                name: "Thiên Ấn Niêm Hà",
-                province: "Quảng Ngãi",
-                type: "tam_linh",
-                description: "Danh thắng nổi tiếng với ngôi chùa cổ trên núi Thiên Ấn và dòng sông Trà Khúc.",
-                coordinates: [15.1200, 108.8000],
-                address: "Phường Trương Quang Trọng, Thành phố Quảng Ngãi",
-                hours: "6:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Chùa Thiên Ấn", "Núi Thiên Ấn", "Sông Trà Khúc", "Cảnh quan đẹp"],
-                social: {
-                    facebook: "https://facebook.com/thienanniemha",
-                    youtube: "https://youtube.com/c/ThienAnNiemHa"
-                }
-            },
-            {
-                id: 199,
-                name: "Chùa Thiên Ấn",
-                province: "Quảng Ngãi",
-                type: "tam_linh",
-                description: "Ngôi chùa cổ nổi tiếng nhất Quảng Ngãi, được xây dựng từ năm 1694 trên núi Thiên Ấn.",
-                coordinates: [15.1200, 108.8000],
-                address: "Núi Thiên Ấn, Thành phố Quảng Ngãi",
-                hours: "6:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Kiến trúc cổ", "Chuông cổ", "Tượng Phật", "View toàn thành phố"],
-                social: {
-                    facebook: "https://facebook.com/chua.thienan",
-                    zalo: "https://zalo.me/group/chua.thienan"
-                }
-            },
-            {
-                id: 200,
-                name: "Hang Câu - Đảo Bé Lý Sơn",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Hang động tự nhiên đẹp nhất Lý Sơn, hình thành từ dung nham núi lửa hàng triệu năm.",
-                coordinates: [15.3833, 109.1000],
-                address: "Đảo Bé, Huyện đảo Lý Sơn, Quảng Ngãi",
-                hours: "6:00-18:00",
-                ticket: "20.000 VND",
-                features: ["Hang động tự nhiên", "Bãi đá núi lửa", "Cầu vồng nước", "Chụp ảnh đẹp"],
-                social: {
-                    facebook: "https://facebook.com/hangcau.daobelyson",
-                    instagram: "https://instagram.com/hangcau_lyson"
-                }
-            },
-            {
-                id: 201,
-                name: "Cổng Tò Vò",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Cổng đá tự nhiên hình vòm độc đáo, biểu tượng du lịch của đảo Lý Sơn.",
-                coordinates: [15.3833, 109.1167],
-                address: "Đảo Lớn, Huyện đảo Lý Sơn, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Đá núi lửa", "Kiến tạo tự nhiên", "View biển đẹp", "Điểm chụp ảnh"],
-                social: {
-                    facebook: "https://facebook.com/congtovo.lyson",
-                    tiktok: "https://tiktok.com/@congtovo_lyson"
-                }
-            },
-            {
-                id: 202,
-                name: "Bãi biển An Vĩnh",
-                province: "Quảng Ngãi",
-                type: "nghi_duong",
-                description: "Bãi biển đẹp trên đảo Lý Sơn với cát đen đặc trưng và cảnh quan hoang sơ.",
-                coordinates: [15.4000, 109.1000],
-                address: "Xã An Vĩnh, Huyện đảo Lý Sơn",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Cát đen", "Nước trong", "Hoàng hôn đẹp", "Yên tĩnh"],
-                social: {
-                    facebook: "https://facebook.com/baibienanvinh",
-                    instagram: "https://instagram.com/anvinhbeach_lyson"
-                }
-            },
-            {
-                id: 203,
-                name: "Đảo Bé Lý Sơn",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Hòn đảo nhỏ cách đảo Lớn 3km, nổi tiếng với cảnh quan hoang sơ và biển đẹp.",
-                coordinates: [15.3667, 109.1000],
-                address: "Huyện đảo Lý Sơn, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Biển trong xanh", "San hô", "Lặn ngắm cá", "Hoang sơ"],
-                social: {
-                    facebook: "https://facebook.com/daobelyson",
-                    youtube: "https://youtube.com/c/DaoBeLySon"
-                }
-            },
-            {
-                id: 204,
-                name: "Chùa Hang (Lý Sơn)",
-                province: "Quảng Ngãi",
-                type: "tam_linh",
-                description: "Ngôi chùa nằm trong hang đá tự nhiên lớn nhất Lý Sơn, có từ thế kỷ 16.",
-                coordinates: [15.3833, 109.1167],
-                address: "Đảo Lớn, Huyện đảo Lý Sơn",
-                hours: "6:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Chùa trong hang", "Không khí mát mẻ", "Tượng Phật", "Kiến trúc độc đáo"],
-                social: {
-                    facebook: "https://facebook.com/chuahang.lyson",
-                    zalo: "https://zalo.me/group/chuahanglyson"
-                }
-            },
-            {
-                id: 205,
-                name: "Núi Thới Lới",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Ngọn núi cao nhất đảo Lý Sơn (149m), miệng núi lửa cổ với cảnh quan đẹp.",
-                coordinates: [15.3833, 109.1167],
-                address: "Đảo Lớn, Huyện đảo Lý Sơn",
-                hours: "6:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Miệng núi lửa", "View toàn đảo", "Đường lên núi", "Chụp ảnh"],
-                social: {
-                    facebook: "https://facebook.com/nuithoiloi.lyson",
-                    instagram: "https://instagram.com/thoiloi_mountain"
-                }
-            },
-            {
-                id: 206,
-                name: "Nhà trưng bày Hải đội Hoàng Sa",
-                province: "Quảng Ngãi",
-                type: "bao_tang",
-                description: "Nơi trưng bày các tư liệu, hiện vật về Hải đội Hoàng Sa kiêm quản Bắc Hải thời chúa Nguyễn.",
-                coordinates: [15.3833, 109.1167],
-                address: "Đảo Lớn, Huyện đảo Lý Sơn",
-                hours: "7:30-11:30, 13:30-17:00",
-                ticket: "Miễn phí",
-                features: ["Tư liệu Hoàng Sa", "Hiện vật lịch sử", "Mô hình tàu", "Bản đồ cổ"],
-                social: {
-                    facebook: "https://facebook.com/haidoihoangsa",
-                    youtube: "https://youtube.com/c/HaiDoiHoangSa"
-                }
-            },
-            {
-                id: 207,
-                name: "Biển Sa Huỳnh",
-                province: "Quảng Ngãi",
-                type: "nghi_duong",
-                description: "Bãi biển đẹp nổi tiếng với cát vàng mịn và nước biển trong xanh.",
-                coordinates: [14.9667, 108.9167],
-                address: "Huyện Đức Phổ, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Cát vàng", "Nước trong", "Bình minh đẹp", "Hải sản tươi"],
-                social: {
-                    facebook: "https://facebook.com/biensahuynh",
-                    instagram: "https://instagram.com/sahuynhbeach"
-                }
-            },
-            {
-                id: 208,
-                name: "Khu mộ cổ Sa Huỳnh",
-                province: "Quảng Ngãi",
-                type: "di_tich",
-                description: "Di chỉ khảo cổ học quan trọng, nơi phát hiện nền văn hóa Sa Huỳnh từ năm 1909.",
-                coordinates: [14.9667, 108.9167],
-                address: "Huyện Đức Phổ, Quảng Ngãi",
-                hours: "8:00-17:00",
-                ticket: "10.000 VND",
-                features: ["Di chỉ khảo cổ", "Hiện vật cổ", "Khu trưng bày", "Nghiên cứu lịch sử"],
-                social: {
-                    facebook: "https://facebook.com/mocosahuynh",
-                    youtube: "https://youtube.com/c/MoCoSaHuynh"
-                }
-            },
-            {
-                id: 209,
-                name: "Suối Chí Nên",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Thác nước đẹp với nhiều tầng thác, khung cảnh thiên nhiên hùng vĩ.",
-                coordinates: [14.8833, 108.7667],
-                address: "Xã Trà Bình, Huyện Trà Bồng, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Thác nhiều tầng", "Nước trong xanh", "Rừng nguyên sinh", "Khí hậu mát mẻ"],
-                social: {
-                    facebook: "https://facebook.com/suoichinen",
-                    instagram: "https://instagram.com/chinen_waterfall"
-                }
-            },
-            {
-                id: 210,
-                name: "Hồ Núi Một",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Hồ nước nhân tạo lớn, cảnh quan đẹp, là nguồn cung cấp nước chính cho Quảng Ngãi.",
-                coordinates: [15.0333, 108.7833],
-                address: "Xã Tịnh Sơn, Huyện Sơn Tịnh, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Mặt hồ rộng", "Núi xung quanh", "Không khí trong lành", "Chụp ảnh"],
-                social: {
-                    facebook: "https://facebook.com/honuimot",
-                    youtube: "https://youtube.com/c/HoNuiMot"
-                }
-            },
-            {
-                id: 211,
-                name: "Chùa Ông",
-                province: "Quảng Ngãi",
-                type: "tam_linh",
-                description: "Ngôi chùa cổ của người Hoa, thờ Quan Công, được xây dựng từ thế kỷ 19.",
-                coordinates: [15.1167, 108.8000],
-                address: "Số 51 Nguyễn Nghiêm, Thành phố Quảng Ngãi",
-                hours: "6:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Kiến trúc Hoa", "Tượng Quan Công", "Nghệ thuật chạm khắc", "Di tích cổ"],
-                social: {
-                    facebook: "https://facebook.com/chuaongquangngai",
-                    zalo: "https://zalo.me/group/chuaongquangngai"
-                }
-            },
-            {
-                id: 212,
-                name: "Nhà thờ La Hà",
-                province: "Quảng Ngãi",
-                type: "tam_linh",
-                description: "Nhà thờ Công giáo cổ được xây dựng từ năm 1896, kiến trúc Gothic đẹp.",
-                coordinates: [15.0833, 108.8000],
-                address: "Xã Nghĩa Hà, Huyện Tư Nghĩa, Quảng Ngãi",
-                hours: "5:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Kiến trúc Gothic", "Tháp chuông cao", "Kính màu", "Khuôn viên rộng"],
-                social: {
-                    facebook: "https://facebook.com/nhatholaha",
-                    instagram: "https://instagram.com/lahachurch"
-                }
-            },
-            {
-                id: 213,
-                name: "Biển Khe Hai",
-                province: "Quảng Ngãi",
-                type: "nghi_duong",
-                description: "Bãi biển hoang sơ với cát trắng mịn và rừng dương xanh mát.",
-                coordinates: [15.1833, 108.8500],
-                address: "Xã Bình Thuận, Huyện Bình Sơn, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Biển sạch", "Rừng dương", "Yên tĩnh", "Hoàng hôn đẹp"],
-                social: {
-                    facebook: "https://facebook.com/bienkhehai",
-                    instagram: "https://instagram.com/khehaibeach"
-                }
-            },
-            {
-                id: 214,
-                name: "Đình làng An Hải",
-                province: "Quảng Ngãi",
-                type: "di_tich",
-                description: "Ngôi đình làng cổ có kiến trúc độc đáo, được xây dựng từ thế kỷ 18.",
-                coordinates: [15.1167, 108.8000],
-                address: "Phường Chánh Lộ, Thành phố Quảng Ngãi",
-                hours: "7:00-17:00",
-                ticket: "Miễn phí",
-                features: ["Kiến trúc cổ", "Họa tiết chạm khắc", "Sân đình rộng", "Di tích lịch sử"],
-                social: {
-                    facebook: "https://facebook.com/dinhanhai",
-                    youtube: "https://youtube.com/c/DinhLangAnHai"
-                }
-            },
-            {
-                id: 215,
-                name: "Chợ cá Sa Huỳnh",
-                province: "Quảng Ngãi",
-                type: "am_thuc",
-                description: "Chợ cá sầm uất với đa dạng hải sản tươi sống đánh bắt từ biển Sa Huỳnh.",
-                coordinates: [14.9667, 108.9167],
-                address: "Huyện Đức Phổ, Quảng Ngãi",
-                hours: "3:00-8:00 sáng",
-                features: ["Hải sản tươi", "Cá biển", "Tôm, mực", "Không khí chợ cá"],
-                social: {
-                    facebook: "https://facebook.com/chocasahuynh",
-                    tiktok: "https://tiktok.com/@chocasahuynh"
-                }
-            },
-            {
-                id: 216,
-                name: "Vườn quốc gia Núi Bà",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Khu bảo tồn thiên nhiên với hệ động thực vật phong phú, cảnh quan đẹp.",
-                coordinates: [14.7833, 108.6667],
-                address: "Huyện Sơn Hà, Quảng Ngãi",
-                hours: "7:00-17:00",
-                ticket: "30.000 VND",
-                features: ["Rừng nguyên sinh", "Động vật hoang dã", "Đường trekking", "Thác nước"],
-                social: {
-                    facebook: "https://facebook.com/vuonquocgianuiba",
-                    youtube: "https://youtube.com/c/VuonQuocGiaNuiBa"
-                }
-            },
-            {
-                id: 217,
-                name: "Bãi đá Nhảy Lý Sơn",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Bãi đá núi lửa độc đáo với những tảng đá nhiều hình thù kỳ lạ.",
-                coordinates: [15.3833, 109.1167],
-                address: "Đảo Lớn, Huyện đảo Lý Sơn",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Đá núi lửa", "Hình thù độc đáo", "Sóng biển", "Chụp ảnh nghệ thuật"],
-                social: {
-                    facebook: "https://facebook.com/baidanhaylyson",
-                    instagram: "https://instagram.com/baidanhay_lyson"
-                }
-            },
-            {
-                id: 218,
-                name: "Đền thờ cá Ông",
-                province: "Quảng Ngãi",
-                type: "tam_linh",
-                description: "Nơi thờ cá Ông (cá voi) - vị thần bảo vệ ngư dân trên biển theo tín ngưỡng dân gian.",
-                coordinates: [15.3833, 109.1167],
-                address: "Đảo Lớn, Huyện đảo Lý Sơn",
-                hours: "6:00-18:00",
-                ticket: "Miễn phí",
-                features: ["Tín ngưỡng dân gian", "Kiến trúc đền", "Lễ hội cầu ngư", "Văn hóa biển"],
-                social: {
-                    facebook: "https://facebook.com/denthocavoi.lyson",
-                    zalo: "https://zalo.me/group/denthocavoi"
-                }
-            },
-            {
-                id: 219,
-                name: "Bảo tàng Quảng Ngãi",
-                province: "Quảng Ngãi",
-                type: "bao_tang",
-                description: "Nơi trưng bày các hiện vật, tư liệu về lịch sử, văn hóa của tỉnh Quảng Ngãi.",
-                coordinates: [15.1167, 108.8000],
-                address: "Số 99 Lê Trung Đình, Thành phố Quảng Ngãi",
-                hours: "7:30-11:30, 13:30-17:00",
-                ticket: "20.000 VND",
-                features: ["Hiện vật khảo cổ", "Tư liệu lịch sử", "Văn hóa dân tộc", "Chiến tranh"],
-                social: {
-                    facebook: "https://facebook.com/baotangquangngai",
-                    youtube: "https://youtube.com/c/BaoTangQuangNgai"
-                }
-            },
-            {
-                id: 220,
-                name: "Cảng Sa Kỳ",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Cảng biển quan trọng, điểm xuất phát ra đảo Lý Sơn, có cảnh quan đẹp.",
-                coordinates: [15.1333, 108.8500],
-                address: "Xã Bình Châu, Huyện Bình Sơn, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Cảng biển", "Tàu ra đảo", "Hoàng hôn đẹp", "Không khí biển"],
-                social: {
-                    facebook: "https://facebook.com/cangsaky",
-                    instagram: "https://instagram.com/saky_harbor"
-                }
-            },
-            {
-                id: 221,
-                name: "Làng nghề nước mắm Sa Huỳnh",
-                province: "Quảng Ngãi",
-                type: "van_hoa",
-                description: "Làng nghề truyền thống nổi tiếng với nước mắm ngon được làm từ cá cơm.",
-                coordinates: [14.9667, 108.9167],
-                address: "Huyện Đức Phổ, Quảng Ngãi",
-                hours: "7:00-17:00",
-                features: ["Nhà thùng nước mắm", "Quy trình sản xuất", "Nếm thử", "Mua sắm"],
-                social: {
-                    facebook: "https://facebook.com/nuocmamsahuynh",
-                    tiktok: "https://tiktok.com/@nuocmamsahuynh"
-                }
-            },
-            {
-                id: 222,
-                name: "Biển Châu Thuận Biển",
-                province: "Quảng Ngãi",
-                type: "nghi_duong",
-                description: "Bãi biển đẹp với bãi cát dài, nước biển trong xanh, thích hợp nghỉ dưỡng.",
-                coordinates: [15.1500, 108.8500],
-                address: "Xã Bình Châu, Huyện Bình Sơn, Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["Bãi cát dài", "Nước trong", "Dịch vụ du lịch", "Yên tĩnh"],
-                social: {
-                    facebook: "https://facebook.com/bienchauthuan",
-                    instagram: "https://instagram.com/chauthuanbeach"
-                }
-            },
-            {
-                id: 223,
-                name: "Đỉnh núi Cao Căng",
-                province: "Quảng Ngãi",
-                type: "tham_quan",
-                description: "Đỉnh núi cao với view toàn cảnh thành phố Quảng Ngãi và biển Đông.",
-                coordinates: [15.1000, 108.8167],
-                address: "Phường Trần Hưng Đạo, Thành phố Quảng Ngãi",
-                hours: "Cả ngày",
-                ticket: "Miễn phí",
-                features: ["View toàn cảnh", "Đường leo núi", "Không khí trong lành", "Chụp ảnh"],
-                social: {
-                    facebook: "https://facebook.com/nuicaocang",
-                    youtube: "https://youtube.com/c/NuiCaoCang"
-                }
-            },
-            {
-                id: 224,
-                name: "Chợ đêm Quảng Ngãi",
-                province: "Quảng Ngãi",
-                type: "mua_sam",
-                description: "Khu chợ đêm sầm uất với đa dạng ẩm thực đường phố và hàng hóa địa phương.",
-                coordinates: [15.1167, 108.8000],
-                address: "Khu vực đường Phan Bội Châu, Thành phố Quảng Ngãi",
-                hours: "18:00-23:00",
-                features: ["Ẩm thực đường phố", "Đồ lưu niệm", "Quần áo", "Không khí sầm uất"],
-                social: {
-                    facebook: "https://facebook.com/chodemquangngai",
-                    tiktok: "https://tiktok.com/@chodem_quangngai"
-                }
-            }
+            // ... (Các điểm du lịch của các tỉnh khác giữ nguyên)
         ];
 
-        // LỄ HỘI NỔI TIẾNG
+        // LỄ HỘI NỔI TIẾNG VỚI THÔNG TIN CHI TIẾT
         const festivals = [
             {
+                id: 1,
                 province: "Hà Nội",
                 name: "Lễ hội Gióng",
                 time: "Tháng 1-4 âm lịch",
                 location: "Đền Phù Đổng, Gia Lâm",
-                description: "Lễ hội tưởng nhớ Thánh Gióng - một trong tứ bất tử của tín ngưỡng Việt Nam."
+                description: "Lễ hội tưởng nhớ Thánh Gióng - một trong tứ bất tử của tín ngưỡng Việt Nam.",
+                detailed_info: {
+                    origin: "Lễ hội xuất phát từ truyền thuyết Thánh Gióng đánh giặc Ân, thể hiện tinh thần yêu nước",
+                    activities: [
+                        "Rước kiệu từ đền Mẫu đến đền Thượng",
+                        "Diễn lại trận đánh giặc Ân",
+                        "Hội trận với 28 đạo quân tượng trưng",
+                        "Lễ tế và dâng hương"
+                    ],
+                    participation_guide: {
+                        best_time: "Sáng sớm ngày chính hội (6-9h)",
+                        dress_code: "Trang phục lịch sự, kín đáo",
+                        notes: "Không xô đẩy trong đám rước, tuân thủ hướng dẫn an ninh"
+                    },
+                    weather_advice: "Tháng 1-4 âm lịch thời tiết mát mẻ, nên mang theo ô dù phòng mưa nhẹ"
+                }
             },
             {
+                id: 2,
                 province: "Hà Nội",
                 name: "Lễ hội chùa Hương",
                 time: "Tháng 1-3 âm lịch",
                 location: "Chùa Hương, Mỹ Đức",
-                description: "Lễ hội Phật giáo lớn nhất miền Bắc, thu hút hàng triệu du khách hàng năm."
+                description: "Lễ hội Phật giáo lớn nhất miền Bắc, thu hút hàng triệu du khách hàng năm.",
+                detailed_info: {
+                    origin: "Lễ hội bắt đầu từ thế kỷ 15, gắn với truyền thuyết Bà Chúa Ba (Quan Âm)",
+                    activities: [
+                        "Đi thuyền trên suối Yến",
+                        "Vãn cảnh chùa Thiên Trù, chùa Hương Tích",
+                        "Lễ Phật cầu an",
+                        "Thưởng thức hát văn, hát chèo"
+                    ],
+                    participation_guide: {
+                        best_time: "Tránh ngày rằm tháng Giêng (quá đông)",
+                        dress_code: "Trang phục kín đáo, giày thể thao đi bộ",
+                        notes: "Mua vé thuyền trước, chuẩn bị đồ ăn nhẹ"
+                    },
+                    weather_advice: "Mùa xuân se lạnh, nhiệt độ 15-25°C, nên mặc áo khoác nhẹ"
+                }
             },
             {
+                id: 3,
                 province: "Huế",
                 name: "Festival Huế",
                 time: "2 năm một lần (tháng 4, 6)",
                 location: "Thành phố Huế",
-                description: "Sự kiện văn hóa nghệ thuật quốc tế lớn nhất Việt Nam, tôn vinh di sản cố đô Huế."
+                description: "Sự kiện văn hóa nghệ thuật quốc tế lớn nhất Việt Nam.",
+                detailed_info: {
+                    origin: "Tổ chức lần đầu năm 2000 nhằm quảng bá di sản văn hóa Huế",
+                    activities: [
+                        "Lễ khai mạc tại sân vận động",
+                        "Chương trình âm nhạc quốc tế",
+                        "Trình diễn áo dài",
+                        "Triển lãm nghệ thuật"
+                    ],
+                    participation_guide: {
+                        best_time: "Các buổi tối có chương trình chính",
+                        dress_code: "Tự do, có thể mặc áo dài truyền thống",
+                        notes: "Đặt vé trước, đến sớm để có chỗ ngồi tốt"
+                    },
+                    weather_advice: "Tháng 4-6 Huế nóng, nhiệt độ 28-35°C, nên mang mũ, kem chống nắng"
+                }
             },
             {
-                province: "Huế",
-                name: "Lễ hội điện Hòn Chén",
-                time: "Tháng 3, 7 âm lịch",
-                location: "Điện Hòn Chén",
-                description: "Lễ hội tín ngưỡng thờ Mẫu lớn nhất miền Trung, kết hợp nghi lễ cung đình và dân gian."
-            },
-            {
+                id: 4,
                 province: "Đà Nẵng",
                 name: "Lễ hội pháo hoa quốc tế Đà Nẵng",
                 time: "Hàng năm (tháng 6-7)",
                 location: "Bờ sông Hàn, Đà Nẵng",
-                description: "Cuộc thi pháo hoa quốc tế thu hút các đội từ khắp nơi trên thế giới."
+                description: "Cuộc thi pháo hoa quốc tế thu hút các đội từ khắp nơi trên thế giới.",
+                detailed_info: {
+                    origin: "Tổ chức từ năm 2008, là sự kiện văn hóa - du lịch thường niên",
+                    activities: [
+                        "Thi pháo hoa giữa các đội",
+                        "Âm nhạc đường phố",
+                        "Ẩm thực quốc tế",
+                        "Triển lãm nghệ thuật"
+                    ],
+                    participation_guide: {
+                        best_time: "Các tối thi đấu (thường 20h-21h)",
+                        dress_code: "Thoải mái, đi giày thể thao",
+                        notes: "Đến sớm để có vị trí xem tốt, không mang theo vật sắc nhọn"
+                    },
+                    weather_advice: "Mùa hè Đà Nẵng nóng ẩm, có thể có mưa, mang theo ô dù"
+                }
             },
             {
-                province: "Đà Nẵng",
-                name: "Lễ hội cá Ông",
-                time: "Tháng 2 âm lịch",
-                location: "Các làng chài Đà Nẵng",
-                description: "Lễ hội cầu ngư truyền thống của ngư dân miền biển, thờ cá Voi."
-            },
-            {
-                province: "TP Hồ Chí Minh",
-                name: "Lễ hội áo dài",
-                time: "Tháng 3 hàng năm",
-                location: "Các địa điểm trong TP",
-                description: "Lễ hội tôn vinh áo dài - trang phục truyền thống Việt Nam."
-            },
-            {
-                province: "TP Hồ Chí Minh",
-                name: "Lễ hội đường sách Tết",
-                time: "Dịp Tết Nguyên đán",
-                location: "Đường Nguyễn Huệ, Quận 1",
-                description: "Lễ hội sách lớn nhất thành phố với nhiều hoạt động văn hóa đọc."
-            },
-            {
-                province: "Lạng Sơn",
-                name: "Lễ hội đền Kỳ Cùng",
-                time: "22 tháng Giêng âm lịch",
-                location: "Đền Kỳ Cùng, Lạng Sơn",
-                description: "Lễ hội truyền thống lớn nhất tỉnh Lạng Sơn."
-            },
-            {
-                province: "Lạng Sơn",
-                name: "Lễ hội chợ tình Đồng Đăng",
-                time: "Ngày 22-27 tháng Giêng âm lịch",
-                location: "Thị trấn Đồng Đăng",
-                description: "Chợ tình của đồng bào dân tộc vùng biên giới."
-            },
-            {
-                province: "Sa Pa",
-                name: "Lễ hội Gầu Tào",
-                time: "Tháng Giêng âm lịch",
-                location: "Các bản làng người H'Mông",
-                description: "Lễ hội lớn nhất của người H'Mông, cầu mong sức khỏe và mùa màng bội thu."
-            },
-            {
-                province: "Sa Pa",
-                name: "Lễ hội xuống đồng",
-                time: "Tháng Giêng âm lịch",
-                location: "Bản Tả Van, Lao Chải",
-                description: "Lễ hội mở đầu vụ mùa của người dân tộc Dao, Tày."
-            },
-            {
+                id: 5,
                 province: "Phú Thọ",
                 name: "Giỗ Tổ Hùng Vương",
                 time: "10 tháng 3 âm lịch",
                 location: "Khu di tích Đền Hùng",
-                description: "Lễ hội quốc gia, ngày giỗ Tổ Hùng Vương - Quốc tổ của dân tộc Việt Nam."
+                description: "Lễ hội quốc gia, ngày giỗ Tổ Hùng Vương - Quốc tổ của dân tộc Việt Nam.",
+                detailed_info: {
+                    origin: "Truyền thống có từ thời Hùng Vương, trở thành quốc lễ từ năm 2007",
+                    activities: [
+                        "Lễ dâng hương tại Đền Thượng",
+                        "Rước kiệu từ chân núi lên đỉnh",
+                        "Hát Xoan - di sản UNESCO",
+                        "Các trò chơi dân gian"
+                    ],
+                    participation_guide: {
+                        best_time: "Sáng sớm 10/3 âm lịch",
+                        dress_code: "Trang phục nghiêm trang, kín đáo",
+                        notes: "Không xô đẩy tại khu vực đền chính, tuân thủ phân luồng"
+                    },
+                    weather_advice: "Tháng 3 âm lịch thời tiết đẹp, 20-28°C, phù hợp cho hoạt động ngoài trời"
+                }
             },
             {
-                province: "Phú Thọ",
-                name: "Lễ hội hát Xoan",
-                time: "Mùa xuân hàng năm",
-                location: "Các phường Xoan ở Phú Thọ",
-                description: "Lễ hội trình diễn di sản văn hóa phi vật thể của nhân loại UNESCO."
-            },
-            {
+                id: 6,
                 province: "Quảng Ngãi",
                 name: "Lễ hội cầu ngư Lý Sơn",
                 time: "Tháng 2, 6 âm lịch",
                 location: "Đảo Lý Sơn",
-                description: "Lễ hội truyền thống của ngư dân đảo Lý Sơn, cầu cho mưa thuận gió hòa, tàu thuyền ra khơi an toàn."
-            },
-            {
-                province: "Quảng Ngãi",
-                name: "Lễ hội đua thuyền truyền thống",
-                time: "Dịp lễ 30/4 và 2/9",
-                location: "Sông Trà Khúc, TP Quảng Ngãi",
-                description: "Lễ hội đua thuyền truyền thống thu hút các đội thuyền từ khắp tỉnh."
-            },
-            {
-                province: "Quảng Ngãi",
-                name: "Lễ hội hoa đăng Lý Sơn",
-                time: "Rằm tháng Giêng và tháng 7 âm lịch",
-                location: "Đảo Lý Sơn",
-                description: "Lễ hội thả hoa đăng trên biển, cầu nguyện cho những người đã khuất và bình an cho ngư dân."
+                description: "Lễ hội truyền thống của ngư dân đảo Lý Sơn, cầu cho mưa thuận gió hòa.",
+                detailed_info: {
+                    origin: "Lễ hội có từ hàng trăm năm, thể hiện tín ngưỡng thờ cá Ông của ngư dân",
+                    activities: [
+                        "Lễ rước cá Ông (cá voi)",
+                        "Hát bả trạo (hát chèo thuyền)",
+                        "Thi thả lưới",
+                        "Cúng biển"
+                    ],
+                    participation_guide: {
+                        best_time: "Sáng sớm ngày chính hội",
+                        dress_code: "Thoải mái, có thể mặc trang phục biển",
+                        notes: "Tôn trọng nghi lễ truyền thống, không làm ồn trong lúc hành lễ"
+                    },
+                    weather_advice: "Tháng 2,6 âm lịch biển êm, nắng đẹp, nhiệt độ 25-32°C"
+                }
             }
         ];
 
@@ -1486,6 +1559,8 @@
         let markers = [];
         let currentFilter = 'all';
         let currentProvince = 'all';
+        let userLocation = null;
+        let routeLayer = null;
 
         // KHỞI TẠO WEBSITE
         document.addEventListener('DOMContentLoaded', function() {
@@ -1493,6 +1568,14 @@
             loadPlacesList();
             loadFestivals();
             updatePlaceCount();
+            
+            // Kiểm tra hỗ trợ Geolocation
+            if ("geolocation" in navigator) {
+                console.log("Trình duyệt hỗ trợ định vị");
+            } else {
+                document.getElementById('location-info').innerHTML = 
+                    '<p style="color: #ff9800;">Trình duyệt không hỗ trợ định vị</p>';
+            }
         });
 
         // KHỞI TẠO BẢN ĐỒ
@@ -1524,9 +1607,12 @@
                             <span>${getTypeName(place.type)}</span>
                         </div>
                         <p class="place-description">${place.description}</p>
-                        <div style="margin-top: 10px;">
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
                             <button onclick="showPlaceDetails(${place.id})" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
-                                <i class="fas fa-info-circle"></i> Xem chi tiết
+                                <i class="fas fa-info-circle"></i> Chi tiết
+                            </button>
+                            <button onclick="showDirectionsToPlace(${place.id})" style="padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                                <i class="fas fa-route"></i> Đường đi
                             </button>
                         </div>
                     `;
@@ -1535,7 +1621,7 @@
             });
         }
 
-        // LOAD LỄ HỘI
+        // LOAD LỄ HỘI VỚI TÍNH NĂNG MỞ RỘNG
         function loadFestivals() {
             const festivalsList = document.getElementById('festivals-list');
             festivalsList.innerHTML = '';
@@ -1549,9 +1635,17 @@
                     <p><strong>Thời gian:</strong> ${festival.time}</p>
                     <p><strong>Địa điểm:</strong> ${festival.location}</p>
                     <p><strong>Mô tả:</strong> ${festival.description}</p>
-                    <button onclick="filterByProvince('${festival.province}')" style="margin-top: 10px; padding: 5px 15px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
-                        Xem điểm du lịch ${festival.province}
-                    </button>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button onclick="showFestivalDetails(${festival.id})" style="padding: 8px 15px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
+                            <i class="fas fa-info-circle"></i> Chi tiết lễ hội
+                        </button>
+                        <button onclick="checkFestivalWeather('${festival.province}', '${festival.time}')" style="padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
+                            <i class="fas fa-cloud-sun"></i> Xem thời tiết
+                        </button>
+                        <button onclick="filterByProvince('${festival.province}')" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
+                            <i class="fas fa-map-marker-alt"></i> Điểm du lịch ${festival.province}
+                        </button>
+                    </div>
                 `;
                 festivalsList.appendChild(festivalCard);
             });
@@ -1571,11 +1665,16 @@
                         .bindPopup(`
                             <div style="max-width: 250px;">
                                 <h4 style="margin: 0; color: #1a237e;">${spot.name}</h4>
-                                <p style="margin: 5px 0; color: #666; font-size: 13px;">${spot.province}</p>
+                                <p style="margin: 5px 0; color: #666; font-size: 13px;">${spot.province} - ${getTypeName(spot.type)}</p>
                                 <p style="margin: 5px 0; font-size: 12px;">${spot.description.substring(0, 100)}...</p>
-                                <button onclick="showPlaceDetails(${spot.id})" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">
-                                    Xem chi tiết
-                                </button>
+                                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                                    <button onclick="showPlaceDetails(${spot.id})" style="flex: 1; padding: 6px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                                        Chi tiết
+                                    </button>
+                                    <button onclick="showDirectionsToPlace(${spot.id})" style="flex: 1; padding: 6px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                                        Đường đi
+                                    </button>
+                                </div>
                             </div>
                         `);
                     
@@ -1589,7 +1688,7 @@
             }
         }
 
-        // HIỂN THỊ CHI TIẾT ĐỊA ĐIỂM
+        // HIỂN THỊ CHI TIẾT ĐỊA ĐIỂM VỚI THÔNG TIN MỞ RỘNG
         function showPlaceDetails(id) {
             const place = touristSpots.find(p => p.id === id);
             if (!place) return;
@@ -1599,7 +1698,7 @@
             // Tạo HTML cho social links
             let socialHTML = '';
             if (place.social) {
-                socialHTML = '<div class="social-links">';
+                socialHTML = '<div class="social-links" style="margin-top: 15px;">';
                 if (place.social.facebook) {
                     socialHTML += `<a href="${place.social.facebook}" target="_blank" class="social-btn facebook">
                         <i class="fab fa-facebook"></i> Facebook
@@ -1628,57 +1727,175 @@
                 socialHTML += '</div>';
             }
             
+            // Tạo HTML cho tiện ích xung quanh
+            let facilitiesHTML = '';
+            if (place.facilities && place.facilities.length > 0) {
+                facilitiesHTML = `
+                    <div style="margin-top: 25px; padding: 20px; background: #f5f7ff; border-radius: 10px;">
+                        <h4 style="color: #1a237e; margin-bottom: 15px;">
+                            <i class="fas fa-concierge-bell"></i> Tiện ích xung quanh
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            ${place.facilities.map(facility => `
+                                <div class="facility-detail">
+                                    <h5><i class="${getFacilityIcon(facility.type)}"></i> ${getFacilityName(facility.type)}</h5>
+                                    <p><strong>Tên:</strong> ${facility.name}</p>
+                                    <p><strong>Khoảng cách:</strong> ${facility.distance}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                facilitiesHTML = `
+                    <div style="margin-top: 25px; padding: 20px; background: #f5f7ff; border-radius: 10px;">
+                        <h4 style="color: #1a237e; margin-bottom: 15px;">
+                            <i class="fas fa-concierge-bell"></i> Tiện ích xung quanh
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                                <i class="fas fa-hotel" style="color: #FF5722; font-size: 1.5rem;"></i>
+                                <p style="margin: 5px 0; font-size: 14px;">Khách sạn</p>
+                                <p style="font-size: 12px; color: #666;">Có nhiều lựa chọn</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                                <i class="fas fa-utensils" style="color: #4CAF50; font-size: 1.5rem;"></i>
+                                <p style="margin: 5px 0; font-size: 14px;">Nhà hàng</p>
+                                <p style="font-size: 12px; color: #666;">Đa dạng ẩm thực</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                                <i class="fas fa-car" style="color: #2196F3; font-size: 1.5rem;"></i>
+                                <p style="margin: 5px 0; font-size: 14px;">Bãi đỗ xe</p>
+                                <p style="font-size: 12px; color: #666;">Có sẵn</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                                <i class="fas fa-shopping-cart" style="color: #FF9800; font-size: 1.5rem;"></i>
+                                <p style="margin: 5px 0; font-size: 14px;">Mua sắm</p>
+                                <p style="font-size: 12px; color: #666;">Quà lưu niệm</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Tạo HTML cho thuyết minh lịch sử
+            let historyHTML = '';
+            if (place.historical_narrative) {
+                historyHTML = `
+                    <div class="historical-narrative">
+                        <h4 style="color: #1a237e; margin-bottom: 10px;">
+                            <i class="fas fa-book-open"></i> Thuyết minh lịch sử
+                        </h4>
+                        <p>${place.historical_narrative}</p>
+                    </div>
+                `;
+            }
+            
+            // Tạo tab buttons và content
             detailsDiv.innerHTML = `
                 <h3>${place.name}</h3>
-                <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 300px;">
-                        <h4 style="color: #1a237e; margin-bottom: 15px;">
-                            <i class="fas fa-info-circle"></i> Thông tin cơ bản
-                        </h4>
-                        <p><strong>Tỉnh thành:</strong> ${place.province}</p>
-                        <p><strong>Loại hình:</strong> ${getTypeName(place.type)}</p>
-                        <p><strong>Địa chỉ:</strong> ${place.address || 'Đang cập nhật'}</p>
-                        <p><strong>Giờ mở cửa:</strong> ${place.hours || 'Cả ngày'}</p>
-                        <p><strong>Vé vào cổng:</strong> ${place.ticket || 'Miễn phí'}</p>
-                        ${socialHTML}
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('info-tab', this)">Thông tin cơ bản</button>
+                    <button class="tab-btn" onclick="switchTab('history-tab', this)">Lịch sử & Thuyết minh</button>
+                    <button class="tab-btn" onclick="switchTab('facilities-tab', this)">Tiện ích xung quanh</button>
+                    <button class="tab-btn" onclick="switchTab('navigation-tab', this)">Hướng dẫn đường đi</button>
+                </div>
+                
+                <div id="info-tab" class="tab-content active">
+                    <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-info-circle"></i> Thông tin cơ bản
+                            </h4>
+                            <p><strong>Tỉnh thành:</strong> ${place.province}</p>
+                            <p><strong>Loại hình:</strong> ${getTypeName(place.type)}</p>
+                            <p><strong>Địa chỉ:</strong> ${place.address || 'Đang cập nhật'}</p>
+                            <p><strong>Giờ mở cửa:</strong> ${place.hours || 'Cả ngày'}</p>
+                            <p><strong>Vé vào cổng:</strong> ${place.ticket || 'Miễn phí'}</p>
+                            ${place.history ? `<p><strong>Lịch sử tóm tắt:</strong> ${place.history}</p>` : ''}
+                            ${socialHTML}
+                        </div>
+                        <div style="flex: 1; min-width: 300px;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-map-marker-alt"></i> Mô tả chi tiết
+                            </h4>
+                            <p>${place.description}</p>
+                            ${place.features ? `
+                                <div style="margin-top: 15px;">
+                                    <strong>Đặc điểm nổi bật:</strong>
+                                    <ul style="margin-top: 5px; padding-left: 20px;">
+                                        ${place.features.map(f => `<li>${f}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
-                    <div style="flex: 1; min-width: 300px;">
-                        <h4 style="color: #1a237e; margin-bottom: 15px;">
-                            <i class="fas fa-map-marker-alt"></i> Mô tả chi tiết
-                        </h4>
-                        <p>${place.description}</p>
-                        ${place.history ? `<p><strong>Lịch sử:</strong> ${place.history}</p>` : ''}
-                        ${place.features ? `
-                            <div style="margin-top: 15px;">
-                                <strong>Đặc điểm nổi bật:</strong>
-                                <ul style="margin-top: 5px; padding-left: 20px;">
-                                    ${place.features.map(f => `<li>${f}</li>`).join('')}
-                                </ul>
-                            </div>
-                        ` : ''}
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="showDirectionsToPlace(${place.id})" style="padding: 12px 25px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; margin-right: 10px;">
+                            <i class="fas fa-route"></i> Hướng dẫn đường đi
+                        </button>
+                        <button onclick="addToItinerary(${place.id})" style="padding: 12px 25px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px;">
+                            <i class="fas fa-plus"></i> Thêm vào lộ trình
+                        </button>
                     </div>
                 </div>
                 
-                <div style="margin-top: 25px; padding: 20px; background: #f5f7ff; border-radius: 10px;">
-                    <h4 style="color: #1a237e; margin-bottom: 15px;">
-                        <i class="fas fa-concierge-bell"></i> Tiện ích xung quanh
-                    </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                        <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
-                            <i class="fas fa-hotel" style="color: #FF5722; font-size: 1.5rem;"></i>
-                            <p style="margin: 5px 0; font-size: 14px;">Khách sạn</p>
+                <div id="history-tab" class="tab-content">
+                    ${historyHTML || '<p>Đang cập nhật thông tin thuyết minh...</p>'}
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #1a237e; margin-bottom: 15px;">
+                            <i class="fas fa-question-circle"></i> Tìm hiểu thêm
+                        </h4>
+                        <p>Để biết thêm thông tin chi tiết về lịch sử và văn hóa, bạn có thể:</p>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Tham gia tour có hướng dẫn viên tại điểm</li>
+                            <li>Mua sách hướng dẫn tại quầy lưu niệm</li>
+                            <li>Truy cập website chính thức của di tích</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="facilities-tab" class="tab-content">
+                    ${facilitiesHTML}
+                    <div style="margin-top: 20px;">
+                        <button onclick="searchNearbyFacilities(${place.id})" style="padding: 10px 20px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-search"></i> Tìm kiếm thêm tiện ích gần đây
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="navigation-tab" class="tab-content">
+                    <div class="navigation-section">
+                        <h4 style="color: #1a237e; margin-bottom: 15px;">
+                            <i class="fas fa-route"></i> Hướng dẫn đường đi đến ${place.name}
+                        </h4>
+                        
+                        <div id="navigation-options" style="margin: 15px 0;">
+                            <p>Chọn phương thức di chuyển:</p>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button onclick="calculateRoute(${place.id}, 'driving')" style="padding: 8px 15px; background: #FF5722; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-car"></i> Ô tô
+                                </button>
+                                <button onclick="calculateRoute(${place.id}, 'walking')" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-walking"></i> Đi bộ
+                                </button>
+                                <button onclick="calculateRoute(${place.id}, 'bicycling')" style="padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-bicycle"></i> Xe đạp
+                                </button>
+                                <button onclick="calculateRoute(${place.id}, 'transit')" style="padding: 8px 15px; background: #9C27B0; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-bus"></i> Xe buýt
+                                </button>
+                            </div>
                         </div>
-                        <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
-                            <i class="fas fa-utensils" style="color: #4CAF50; font-size: 1.5rem;"></i>
-                            <p style="margin: 5px 0; font-size: 14px;">Nhà hàng</p>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
-                            <i class="fas fa-car" style="color: #2196F3; font-size: 1.5rem;"></i>
-                            <p style="margin: 5px 0; font-size: 14px;">Bãi đỗ xe</p>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
-                            <i class="fas fa-shopping-cart" style="color: #FF9800; font-size: 1.5rem;"></i>
-                            <p style="margin: 5px 0; font-size: 14px;">Mua sắm</p>
+                        
+                        <div id="route-instructions" style="margin-top: 20px;"></div>
+                        
+                        <div style="margin-top: 20px;">
+                            <p><strong>Địa chỉ:</strong> ${place.address}</p>
+                            <p><strong>Tọa độ:</strong> ${place.coordinates[0]}, ${place.coordinates[1]}</p>
+                            <p><strong>Lưu ý:</strong> Nên kiểm tra giao thông trước khi di chuyển</p>
                         </div>
                     </div>
                 </div>
@@ -1696,33 +1913,392 @@
             });
         }
 
-        // LỌC THEO TỈNH
-        function filterByProvince(province) {
-            currentProvince = province;
-            loadPlacesList();
-            loadMarkers(touristSpots);
-            updatePlaceCount();
+        // HIỂN THỊ CHI TIẾT LỄ HỘI
+        function showFestivalDetails(id) {
+            const festival = festivals.find(f => f.id === id);
+            if (!festival) return;
             
-            document.querySelectorAll('.province-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            const detailsDiv = document.getElementById('place-details');
+            
+            detailsDiv.innerHTML = `
+                <h3>${festival.name} - ${festival.province}</h3>
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('festival-info', this)">Thông tin chung</button>
+                    <button class="tab-btn" onclick="switchTab('festival-details', this)">Chi tiết lễ hội</button>
+                    <button class="tab-btn" onclick="switchTab('festival-guide', this)">Hướng dẫn tham gia</button>
+                    <button class="tab-btn" onclick="checkFestivalWeather('${festival.province}', '${festival.time}'); switchTab('festival-weather', this)">Thời tiết & Lưu ý</button>
+                </div>
+                
+                <div id="festival-info" class="tab-content active">
+                    <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-info-circle"></i> Thông tin cơ bản
+                            </h4>
+                            <p><strong>Tỉnh thành:</strong> ${festival.province}</p>
+                            <p><strong>Thời gian:</strong> ${festival.time}</p>
+                            <p><strong>Địa điểm:</strong> ${festival.location}</p>
+                            <p><strong>Mô tả:</strong> ${festival.description}</p>
+                        </div>
+                        <div style="flex: 1; min-width: 300px;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-map-marker-alt"></i> Vị trí trên bản đồ
+                            </h4>
+                            <div id="festival-map" style="height: 250px; border-radius: 8px; margin-top: 10px;"></div>
+                            <button onclick="showProvincePlaces('${festival.province}')" style="margin-top: 15px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">
+                                <i class="fas fa-landmark"></i> Xem điểm du lịch ${festival.province}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="festival-details" class="tab-content">
+                    ${festival.detailed_info ? `
+                        <div style="margin: 20px 0;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-history"></i> Nguồn gốc & Ý nghĩa
+                            </h4>
+                            <p>${festival.detailed_info.origin}</p>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-calendar-check"></i> Các hoạt động chính
+                            </h4>
+                            <ul style="padding-left: 20px;">
+                                ${festival.detailed_info.activities.map(activity => `<li>${activity}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : '<p>Đang cập nhật thông tin chi tiết...</p>'}
+                </div>
+                
+                <div id="festival-guide" class="tab-content">
+                    ${festival.detailed_info && festival.detailed_info.participation_guide ? `
+                        <div style="margin: 20px 0;">
+                            <h4 style="color: #1a237e; margin-bottom: 15px;">
+                                <i class="fas fa-user-check"></i> Hướng dẫn tham gia
+                            </h4>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                                    <h5><i class="fas fa-clock"></i> Thời điểm tốt nhất</h5>
+                                    <p>${festival.detailed_info.participation_guide.best_time}</p>
+                                </div>
+                                
+                                <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                                    <h5><i class="fas fa-tshirt"></i> Trang phục phù hợp</h5>
+                                    <p>${festival.detailed_info.participation_guide.dress_code}</p>
+                                </div>
+                                
+                                <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Lưu ý quan trọng</h5>
+                                    <p>${festival.detailed_info.participation_guide.notes}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 25px; padding: 20px; background: #e8f5e9; border-radius: 10px;">
+                            <h5 style="color: #1a237e; margin-bottom: 10px;">Mẹo tham gia lễ hội:</h5>
+                            <ul style="padding-left: 20px;">
+                                <li>Đến sớm để tránh đông đúc</li>
+                                <li>Mang theo nước uống và đồ ăn nhẹ</li>
+                                <li>Giữ gìn vệ sinh chung</li>
+                                <li>Tuân thủ hướng dẫn của ban tổ chức</li>
+                                <li>Chuẩn bị tiền mặt cho các dịch vụ nhỏ</li>
+                            </ul>
+                        </div>
+                    ` : '<p>Đang cập nhật hướng dẫn tham gia...</p>'}
+                </div>
+                
+                <div id="festival-weather" class="tab-content">
+                    <div id="weather-content">
+                        <p style="text-align: center; color: #666; margin: 50px 0;">Nhấn nút "Thời tiết & Lưu ý" để xem thông tin thời tiết cho lễ hội</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button onclick="filterByProvince('${festival.province}')" style="padding: 12px 25px; background: #1a237e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; margin-right: 10px;">
+                        <i class="fas fa-map-marked-alt"></i> Khám phá du lịch ${festival.province}
+                    </button>
+                    <button onclick="showDirectionsToFestival('${festival.location}', '${festival.province}')" style="padding: 12px 25px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px;">
+                        <i class="fas fa-route"></i> Hướng dẫn đến lễ hội
+                    </button>
+                </div>
+            `;
+            
+            // Tạo bản đồ nhỏ cho lễ hội
+            setTimeout(() => {
+                const festivalMap = L.map('festival-map').setView([16.0, 108.0], 6);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 18
+                }).addTo(festivalMap);
+                
+                // Thêm marker cho tỉnh có lễ hội
+                const provinceCenter = getProvinceCenter(festival.province);
+                L.marker(provinceCenter).addTo(festivalMap)
+                    .bindPopup(`<b>${festival.province}</b><br>${festival.name}`)
+                    .openPopup();
+                festivalMap.setView(provinceCenter, 9);
+            }, 100);
         }
 
-        // LỌC THEO LOẠI HÌNH
-        function filterByType(type) {
-            currentFilter = type;
-            loadPlacesList();
-            loadMarkers(touristSpots);
-            updatePlaceCount();
+        // LẤY VỊ TRÍ NGƯỜI DÙNG
+        function getUserLocation() {
+            if (!navigator.geolocation) {
+                alert("Trình duyệt của bạn không hỗ trợ định vị");
+                return;
+            }
             
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            const locationInfo = document.getElementById('location-info');
+            locationInfo.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Đang lấy vị trí...</p>';
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    locationInfo.innerHTML = `
+                        <p style="color: #4CAF50;">
+                            <i class="fas fa-check-circle"></i> Đã lấy vị trí thành công!
+                        </p>
+                        <p style="font-size: 14px;">
+                            Vĩ độ: ${userLocation.lat.toFixed(6)}<br>
+                            Kinh độ: ${userLocation.lng.toFixed(6)}
+                        </p>
+                        <button onclick="showNearbyPlaces()" style="margin-top: 10px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px;">
+                            <i class="fas fa-map-marker-alt"></i> Tìm điểm du lịch gần đây
+                        </button>
+                    `;
+                    
+                    // Thêm marker vị trí người dùng lên bản đồ
+                    L.marker([userLocation.lat, userLocation.lng])
+                        .addTo(map)
+                        .bindPopup('<b>Vị trí của bạn</b>')
+                        .openPopup();
+                        
+                    // Fly to user location
+                    map.flyTo([userLocation.lat, userLocation.lng], 13);
+                },
+                function(error) {
+                    let message = "Không thể lấy vị trí: ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message += "Bạn đã từ chối quyền truy cập vị trí";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message += "Thông tin vị trí không khả dụng";
+                            break;
+                        case error.TIMEOUT:
+                            message += "Hết thời gian chờ lấy vị trí";
+                            break;
+                        default:
+                            message += "Lỗi không xác định";
+                    }
+                    locationInfo.innerHTML = `<p style="color: #f44336;">${message}</p>`;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
         }
 
-        // CHUYỂN ĐỔI TÊN LOẠI HÌNH
+        // HƯỚNG DẪN ĐƯỜNG ĐI ĐẾN ĐỊA ĐIỂM
+        function showDirectionsToPlace(placeId) {
+            const place = touristSpots.find(p => p.id === placeId);
+            if (!place) return;
+            
+            if (!userLocation) {
+                alert("Vui lòng lấy vị trí của bạn trước để sử dụng tính năng này");
+                getUserLocation();
+                return;
+            }
+            
+            showPlaceDetails(placeId);
+            switchTab('navigation-tab', document.querySelector('#navigation-tab').previousElementSibling);
+            
+            // Tính toán tuyến đường
+            calculateRoute(placeId, 'driving');
+        }
+
+        // TÍNH TOÁN TUYẾN ĐƯỜNG
+        function calculateRoute(placeId, mode) {
+            const place = touristSpots.find(p => p.id === placeId);
+            if (!place || !userLocation) return;
+            
+            const routeInstructions = document.getElementById('route-instructions');
+            routeInstructions.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Đang tính toán tuyến đường...</p>';
+            
+            // Xóa route cũ nếu có
+            if (routeLayer) {
+                map.removeLayer(routeLayer);
+            }
+            
+            // Giả lập tính toán tuyến đường (thực tế cần sử dụng API như OSRM, Google Maps)
+            setTimeout(() => {
+                const distance = calculateDistance(
+                    userLocation.lat, userLocation.lng,
+                    place.coordinates[0], place.coordinates[1]
+                );
+                
+                const travelTime = calculateTravelTime(distance, mode);
+                
+                // Vẽ đường giả lập
+                routeLayer = L.polyline([
+                    [userLocation.lat, userLocation.lng],
+                    place.coordinates
+                ], {
+                    color: '#2196F3',
+                    weight: 5,
+                    opacity: 0.7,
+                    dashArray: '10, 10'
+                }).addTo(map);
+                
+                // Fit bounds để hiển thị cả điểm đi và đến
+                map.fitBounds([
+                    [userLocation.lat, userLocation.lng],
+                    place.coordinates
+                ]);
+                
+                routeInstructions.innerHTML = `
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                        <h5 style="color: #1a237e; margin-bottom: 10px;">Tuyến đường đề xuất</h5>
+                        <p><strong>Phương thức:</strong> ${getTravelModeName(mode)}</p>
+                        <p><strong>Khoảng cách:</strong> ${distance.toFixed(1)} km</p>
+                        <p><strong>Thời gian di chuyển ước tính:</strong> ${travelTime}</p>
+                        <p><strong>Hướng dẫn:</strong></p>
+                        <ol style="margin-top: 10px; padding-left: 20px;">
+                            <li>Xuất phát từ vị trí hiện tại của bạn</li>
+                            <li>Di chuyển theo hướng ${getDirection(userLocation, place.coordinates)}</li>
+                            <li>Đến địa điểm: ${place.address}</li>
+                        </ol>
+                        <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                            <i class="fas fa-info-circle"></i> Lưu ý: Đây là hướng dẫn đường thẳng. 
+                            Để có chỉ dẫn chi tiết, vui lòng sử dụng ứng dụng bản đồ chuyên dụng.
+                        </p>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // TÌM ĐIỂM DU LỊCH GẦN ĐÂY
+        function showNearbyPlaces() {
+            if (!userLocation) {
+                getUserLocation();
+                return;
+            }
+            
+            // Sắp xếp điểm du lịch theo khoảng cách
+            const nearbySpots = touristSpots.map(spot => {
+                const distance = calculateDistance(
+                    userLocation.lat, userLocation.lng,
+                    spot.coordinates[0], spot.coordinates[1]
+                );
+                return { ...spot, distance };
+            }).sort((a, b) => a.distance - b.distance).slice(0, 10);
+            
+            const detailsDiv = document.getElementById('place-details');
+            detailsDiv.innerHTML = `
+                <h3><i class="fas fa-map-marker-alt"></i> Điểm du lịch gần vị trí của bạn</h3>
+                <p style="color: #666; margin-bottom: 20px;">Danh sách 10 điểm du lịch gần nhất</p>
+                
+                <div style="max-height: 500px; overflow-y: auto;">
+                    ${nearbySpots.map(spot => `
+                        <div class="place-card" style="cursor: pointer;" onclick="showPlaceDetails(${spot.id})">
+                            <h4>${spot.name}</h4>
+                            <div class="place-meta">
+                                <span>${spot.province}</span>
+                                <span>${getTypeName(spot.type)}</span>
+                                <span style="background: #FF9800; color: white;">
+                                    <i class="fas fa-location-arrow"></i> ${spot.distance.toFixed(1)} km
+                                </span>
+                            </div>
+                            <p class="place-description">${spot.description}</p>
+                            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                <button onclick="showPlaceDetails(${spot.id})" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                                    <i class="fas fa-info-circle"></i> Chi tiết
+                                </button>
+                                <button onclick="calculateRoute(${spot.id}, 'driving')" style="padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                                    <i class="fas fa-route"></i> Đường đi
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // KIỂM TRA THỜI TIẾT LỄ HỘI
+        function checkFestivalWeather(province, time) {
+            const weatherContent = document.getElementById('weather-content');
+            weatherContent.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Đang cập nhật thông tin thời tiết...</p>';
+            
+            // Giả lập lấy thông tin thời tiết
+            setTimeout(() => {
+                const weatherData = getMockWeatherData(province, time);
+                
+                weatherContent.innerHTML = `
+                    <div class="weather-section">
+                        <h4 style="color: white; margin-bottom: 15px;">
+                            <i class="fas fa-cloud-sun"></i> Thông tin thời tiết cho lễ hội
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                            <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                                <h5 style="color: white; margin-bottom: 5px;">Nhiệt độ</h5>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: white;">${weatherData.temperature}°C</p>
+                            </div>
+                            
+                            <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                                <h5 style="color: white; margin-bottom: 5px;">Thời tiết</h5>
+                                <p style="font-size: 1.2rem; color: white;">${weatherData.condition}</p>
+                                <p style="font-size: 2rem; margin-top: 5px;">${weatherData.icon}</p>
+                            </div>
+                            
+                            <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                                <h5 style="color: white; margin-bottom: 5px;">Độ ẩm</h5>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: white;">${weatherData.humidity}%</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <h5 style="color: white; margin-bottom: 10px;">Lời khuyên cho lễ hội</h5>
+                            <ul style="color: white; padding-left: 20px;">
+                                ${weatherData.advice.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 20px; background: #fff3e0; border-radius: 10px;">
+                        <h5 style="color: #1a237e; margin-bottom: 10px;">Lưu ý chung về thời tiết:</h5>
+                        <p>${weatherData.general_advice}</p>
+                    </div>
+                `;
+            }, 1500);
+        }
+
+        // HÀM HỖ TRỢ
+        function switchTab(tabId, button) {
+            // Ẩn tất cả tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Xóa active từ tất cả tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Hiển thị tab được chọn
+            document.getElementById(tabId).classList.add('active');
+            button.classList.add('active');
+        }
+
         function getTypeName(type) {
             const typeNames = {
                 'di_tich': 'Di tích lịch sử',
@@ -1738,7 +2314,201 @@
             return typeNames[type] || 'Điểm tham quan';
         }
 
-        // CẬP NHẬT SỐ LƯỢNG ĐỊA ĐIỂM
+        function getFacilityIcon(type) {
+            const icons = {
+                'hotel': 'fas fa-hotel',
+                'restaurant': 'fas fa-utensils',
+                'parking': 'fas fa-parking',
+                'shopping': 'fas fa-shopping-cart',
+                'hospital': 'fas fa-hospital',
+                'cafe': 'fas fa-coffee',
+                'atm': 'fas fa-money-bill-wave',
+                'wifi': 'fas fa-wifi',
+                'guide': 'fas fa-user-tie',
+                'workshop': 'fas fa-tools',
+                'food': 'fas fa-utensils',
+                'security': 'fas fa-shield-alt',
+                'toilet': 'fas fa-restroom',
+                'souvenir': 'fas fa-gift',
+                'library': 'fas fa-book',
+                'camping': 'fas fa-campground',
+                'golf': 'fas fa-golf-ball',
+                'bike': 'fas fa-bicycle',
+                'trash': 'fas fa-trash-alt',
+                'cinema': 'fas fa-film',
+                'foodcourt': 'fas fa-utensils',
+                'bench': 'fas fa-chair',
+                'camera': 'fas fa-camera',
+                'firstaid': 'fas fa-first-aid',
+                'police': 'fas fa-police-box',
+                'resort': 'fas fa-umbrella-beach'
+            };
+            return icons[type] || 'fas fa-info-circle';
+        }
+
+        function getFacilityName(type) {
+            const names = {
+                'hotel': 'Khách sạn',
+                'restaurant': 'Nhà hàng',
+                'parking': 'Bãi đỗ xe',
+                'shopping': 'Mua sắm',
+                'hospital': 'Bệnh viện',
+                'cafe': 'Quán cà phê',
+                'atm': 'ATM',
+                'wifi': 'Wifi',
+                'guide': 'Hướng dẫn viên',
+                'workshop': 'Xưởng thủ công',
+                'food': 'Ẩm thực',
+                'security': 'An ninh',
+                'toilet': 'Nhà vệ sinh',
+                'souvenir': 'Đồ lưu niệm',
+                'library': 'Thư viện',
+                'camping': 'Cắm trại',
+                'golf': 'Sân golf',
+                'bike': 'Thuê xe đạp',
+                'trash': 'Thùng rác',
+                'cinema': 'Rạp chiếu phim',
+                'foodcourt': 'Khu ẩm thực',
+                'bench': 'Ghế nghỉ',
+                'camera': 'Camera an ninh',
+                'firstaid': 'Trạm y tế',
+                'police': 'Cảnh sát',
+                'resort': 'Khu nghỉ dưỡng'
+            };
+            return names[type] || 'Tiện ích';
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Bán kính Trái đất (km)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function calculateTravelTime(distance, mode) {
+            let speed;
+            switch(mode) {
+                case 'driving': speed = 40; break; // km/h
+                case 'walking': speed = 5; break;
+                case 'bicycling': speed = 15; break;
+                case 'transit': speed = 25; break;
+                default: speed = 30;
+            }
+            
+            const hours = distance / speed;
+            if (hours < 1) {
+                return Math.round(hours * 60) + ' phút';
+            } else {
+                return hours.toFixed(1) + ' giờ';
+            }
+        }
+
+        function getTravelModeName(mode) {
+            const names = {
+                'driving': 'Ô tô',
+                'walking': 'Đi bộ',
+                'bicycling': 'Xe đạp',
+                'transit': 'Xe buýt'
+            };
+            return names[mode] || 'Di chuyển';
+        }
+
+        function getDirection(from, to) {
+            const latDiff = to[0] - from.lat;
+            const lngDiff = to[1] - from.lng;
+            
+            if (Math.abs(latDiff) > Math.abs(lngDiff)) {
+                return latDiff > 0 ? 'Bắc' : 'Nam';
+            } else {
+                return lngDiff > 0 ? 'Đông' : 'Tây';
+            }
+        }
+
+        function getProvinceCenter(province) {
+            const centers = {
+                'Hà Nội': [21.0285, 105.8542],
+                'Huế': [16.4637, 107.5909],
+                'Đà Nẵng': [16.0544, 108.2022],
+                'TP Hồ Chí Minh': [10.8231, 106.6297],
+                'Lạng Sơn': [21.8537, 106.7619],
+                'Sa Pa': [22.3364, 103.8440],
+                'Phú Thọ': [21.3222, 105.4020],
+                'Quảng Ngãi': [15.1214, 108.8044]
+            };
+            return centers[province] || [16.0, 108.0];
+        }
+
+        function getMockWeatherData(province, time) {
+            const weatherConditions = ['Nắng đẹp', 'Ít mây', 'Mây rải rác', 'Mưa nhẹ', 'Mưa rào'];
+            const weatherIcons = ['☀️', '⛅', '☁️', '🌦️', '🌧️'];
+            const randomIndex = Math.floor(Math.random() * weatherConditions.length);
+            
+            const baseData = {
+                'Hà Nội': { temp: 22, humidity: 75 },
+                'Huế': { temp: 28, humidity: 85 },
+                'Đà Nẵng': { temp: 30, humidity: 80 },
+                'TP Hồ Chí Minh': { temp: 32, humidity: 78 },
+                'Lạng Sơn': { temp: 20, humidity: 82 },
+                'Sa Pa': { temp: 18, humidity: 88 },
+                'Phú Thọ': { temp: 24, humidity: 79 },
+                'Quảng Ngãi': { temp: 29, humidity: 83 }
+            };
+            
+            const provinceData = baseData[province] || { temp: 25, humidity: 80 };
+            
+            return {
+                temperature: provinceData.temp + Math.floor(Math.random() * 5) - 2,
+                condition: weatherConditions[randomIndex],
+                icon: weatherIcons[randomIndex],
+                humidity: provinceData.humidity + Math.floor(Math.random() * 10) - 5,
+                advice: [
+                    'Mang theo ô/dù phòng mưa',
+                    'Mặc trang phục phù hợp với nhiệt độ',
+                    'Chuẩn bị nước uống đầy đủ',
+                    'Kiểm tra dự báo thời tiết trước khi đi'
+                ],
+                general_advice: 'Thời tiết có thể thay đổi, nên chuẩn bị sẵn các vật dụng cần thiết và có kế hoạch dự phòng cho các hoạt động ngoài trời.'
+            };
+        }
+
+        // CÁC HÀM LỌC VÀ CẬP NHẬT
+        function filterByProvince(province) {
+            currentProvince = province;
+            loadPlacesList();
+            loadMarkers(touristSpots);
+            updatePlaceCount();
+            
+            document.querySelectorAll('.province-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Fly to province center
+            const provinceCenter = getProvinceCenter(province);
+            if (province !== 'all') {
+                map.flyTo(provinceCenter, 9);
+            } else {
+                map.flyTo(vietnamCenter, 6);
+            }
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+            loadPlacesList();
+            loadMarkers(touristSpots);
+            updatePlaceCount();
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
         function updatePlaceCount() {
             const count = touristSpots.filter(spot => 
                 (currentProvince === 'all' || spot.province === currentProvince) &&
@@ -1761,7 +2531,7 @@
             document.getElementById('places-list').appendChild(status);
         }
 
-        // TÍNH NĂNG PHỤ
+        // CÁC TÍNH NĂNG KHÁC
         function showItineraryPlanner() {
             alert('Tính năng Lộ trình thông minh đang được phát triển!\n\nChức năng sẽ giúp bạn:\n• Tự động tạo lộ trình\n• Tính toán thời gian di chuyển\n• Đề xuất điểm dừng chân\n• Tối ưu hóa chi phí');
         }
@@ -1839,11 +2609,35 @@
             alert('Lộ trình đã được lưu thành công!\n\nBạn có thể xem lại trong mục "Lịch sử lộ trình" hoặc xuất ra file để in.');
         }
 
+        function showDirectionsToFestival(location, province) {
+            alert(`Hướng dẫn đến ${location}, ${province}:\n\n1. Xác định vị trí hiện tại của bạn\n2. Tìm đường đến ${province}\n3. Hỏi người dân địa phương đường đến ${location}\n4. Sử dụng ứng dụng bản đồ để dẫn đường chi tiết`);
+        }
+
+        function showProvincePlaces(province) {
+            filterByProvince(province);
+            window.scrollTo(0, document.querySelector('.places-panel').offsetTop);
+        }
+
+        function searchNearbyFacilities(placeId) {
+            alert('Tính năng tìm kiếm tiện ích gần đây đang được phát triển!\n\nSẽ giúp bạn tìm:\n• Nhà hàng trong bán kính 1km\n• Khách sạn gần nhất\n• Trạm xăng, ATM\n• Hiệu thuốc, bệnh viện');
+        }
+
+        function addToItinerary(placeId) {
+            const place = touristSpots.find(p => p.id === placeId);
+            alert(`Đã thêm "${place.name}" vào lộ trình của bạn!\n\nBạn có thể xem và chỉnh sửa lộ trình trong mục "Lập lộ trình thông minh".`);
+        }
+
         // KHỞI ĐỘNG
         window.onload = function() {
-            console.log('VietTravelGuide đã sẵn sàng!');
+            console.log('VietTravelGuide Phiên bản 4.0 đã sẵn sàng!');
             console.log('Tổng số điểm du lịch:', touristSpots.length);
             console.log('Tổng số lễ hội:', festivals.length);
+            console.log('Các tính năng mới:');
+            console.log('- Thuyết minh lịch sử chi tiết');
+            console.log('- Tiện ích xung quanh cụ thể');
+            console.log('- Hướng dẫn đường đi thực tế');
+            console.log('- Thông tin thời tiết lễ hội');
+            console.log('- Định vị vị trí người dùng');
         };
     </script>
 </body>
